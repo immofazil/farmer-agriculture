@@ -60,11 +60,29 @@
     </div>
   </div>
 
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Delete Chat</h3>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this chat? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancelDelete">Cancel</button>
+        <button class="btn-danger" id="confirmDelete">Delete Chat</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     class ChatManager {
       constructor() {
         this.chats = JSON.parse(localStorage.getItem('farmerChats')) || [];
         this.currentChatId = localStorage.getItem('currentChatId') || null;
+        this.chatToDelete = null;
         this.init();
       }
 
@@ -88,6 +106,36 @@
         this.saveChats();
         this.renderChatHistory();
         this.loadCurrentChat();
+      }
+
+      deleteChat(chatId) {
+        this.chatToDelete = chatId;
+        this.showDeleteModal();
+      }
+
+      confirmDelete() {
+        if (this.chatToDelete) {
+          this.chats = this.chats.filter(chat => chat.id !== this.chatToDelete);
+          
+          // If we deleted the current chat, select the first available chat or create a new one
+          if (this.currentChatId === this.chatToDelete) {
+            this.currentChatId = this.chats.length > 0 ? this.chats[0].id : null;
+          }
+          
+          this.saveChats();
+          this.renderChatHistory();
+          this.loadCurrentChat();
+          this.hideDeleteModal();
+          this.chatToDelete = null;
+        }
+      }
+
+      showDeleteModal() {
+        document.getElementById('deleteModal').classList.add('show');
+      }
+
+      hideDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('show');
       }
 
       loadCurrentChat() {
@@ -215,11 +263,18 @@
         this.chats.forEach(chat => {
           const chatDiv = document.createElement('div');
           chatDiv.className = `chat-item ${chat.id === this.currentChatId ? 'active' : ''}`;
-          chatDiv.onclick = () => this.selectChat(chat.id);
           chatDiv.innerHTML = `
-            <span class="chat-title">${chat.title}</span>
-            <span class="chat-date">${new Date(chat.createdAt).toLocaleDateString()}</span>
+            <div class="chat-item-content">
+              <span class="chat-title">${chat.title}</span>
+              <span class="chat-date">${new Date(chat.createdAt).toLocaleDateString()}</span>
+            </div>
+            <button class="delete-chat-btn" onclick="event.stopPropagation(); chatManager.deleteChat('${chat.id}')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
           `;
+          chatDiv.onclick = () => this.selectChat(chat.id);
           container.appendChild(chatDiv);
         });
       }
@@ -251,6 +306,18 @@
           if (message) {
             this.sendMessage(message);
             input.value = '';
+          }
+        };
+
+        // Modal event listeners
+        document.getElementById('closeModal').onclick = () => this.hideDeleteModal();
+        document.getElementById('cancelDelete').onclick = () => this.hideDeleteModal();
+        document.getElementById('confirmDelete').onclick = () => this.confirmDelete();
+        
+        // Close modal when clicking outside
+        document.getElementById('deleteModal').onclick = (e) => {
+          if (e.target.id === 'deleteModal') {
+            this.hideDeleteModal();
           }
         };
       }

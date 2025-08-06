@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer AI Advisor - Login</title>
+  <link rel="stylesheet" href="login.css">
+  <style>
+    .password-field {
+      position: relative;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+    }
+    
+    .password-toggle:hover {
+      color: #333;
+    }
+    
+    .error-message {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo">
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><rect width='100%' height='100%' rx='30' fill='%23a8e063'/><text x='50%' y='54%' font-size='24' text-anchor='middle' fill='white' font-family='Segoe UI, Arial' dy='.3em'>AI</text></svg>" alt="AI" />
+        </div>
+        <h1>Farmer AI Advisor</h1>
+        <p>Your intelligent farming companion</p>
+      </div>
+      
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required placeholder="Enter your username">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-field">
+            <input type="password" id="password" name="password" required placeholder="Enter your password">
+            <button type="button" class="password-toggle" onclick="togglePassword('password')">👁️</button>
+          </div>
+        </div>
+        
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe">
+            <span class="checkmark"></span>
+            Remember me
+          </label>
+          <a href="/forgot-password.html" class="forgot-password">Forgot password?</a>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <button type="submit" class="login-btn">
+          <span>Sign In</span>
+          <div class="btn-loader" id="btnLoader"></div>
+        </button>
+      </form>
+      
+      <div class="login-footer">
+        <p>Don't have an account? <a href="/register.html">Register here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(fieldId) {
+      const field = document.getElementById(fieldId);
+      const toggle = field.nextElementSibling;
+      
+      if (field.type === 'password') {
+        field.type = 'text';
+        toggle.textContent = '🙈';
+      } else {
+        field.type = 'password';
+        toggle.textContent = '👁️';
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+    }
+
+    function hideError() {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.style.display = 'none';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      hideError();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('rememberMe').checked;
+      
+      if (!username || !password) {
+        showError('Please enter both username and password');
+        return;
+      }
+      
+      // Show loading state
+      const btn = document.querySelector('.login-btn');
+      const btnText = btn.querySelector('span');
+      const loader = document.getElementById('btnLoader');
+      
+      btnText.style.opacity = '0';
+      loader.style.display = 'block';
+      btn.disabled = true;
+      
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store login state
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('username', data.user.username);
+          localStorage.setItem('fullName', data.user.fullName);
+          localStorage.setItem('userId', data.user.id);
+          if (rememberMe) {
+            localStorage.setItem('rememberMe', 'true');
+          }
+          
+          // Redirect to main chat page
+          window.location.href = '/index.html';
+        } else {
+          showError(data.message || 'Invalid credentials. Please try again.');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showError('Network error. Please check your connection and try again.');
+      } finally {
+        btnText.style.opacity = '1';
+        loader.style.display = 'none';
+        btn.disabled = false;
+      }
+    });
+    
+    // Check if user is already logged in
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      window.location.href = '/index.html';
+    }
+  </script>
+</body>
+</html> 

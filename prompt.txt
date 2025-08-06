@@ -1,0 +1,11 @@
+Theme: Exploring and Building Agentic AI Solutions for the agriculture sector in India.
+Challenge: Create a human-aligned, AI-powered advisor that can help farmers in India with a wide range of queries. The solutions should be accessible to users with low digital access and must use only publicly available datasets.
+Queries to Address:
+Irrigation timing
+Seed variety selection
+Weather impact
+Market conditions
+Access to finance and government policies
+
+
+Create a Node.js Express API that accepts a POST request with a question from a farmer and responds using a dummy text (for now).

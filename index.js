@@ -1,7 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const db = require('./database');
+
+// Debug: Check if OpenAI API key is loaded
+console.log('🔑 OpenAI API Key loaded:', process.env.OPENAI_API_KEY ? 'Yes (length: ' + process.env.OPENAI_API_KEY.length + ')' : 'No');
+console.log('🤖 AI Service will be used for responses');
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -97,17 +102,34 @@ app.delete('/delete-chat/:userId/:chatId', async (req, res) => {
   }
 });
 
-// POST endpoint for farmer questions (protected by frontend auth)
-app.post('/ask', (req, res) => {
+// POST endpoint for farmer questions with AI integration
+app.post('/ask', async (req, res) => {
   try {
-    const { question } = req.body;
-    // For now, respond with dummy text
-    const answer = 'This is a dummy response. Your question was: ' + (question || 'No question provided.');
-    console.log('Sending answer:', answer);
+    const { question, conversationHistory } = req.body;
+    
+    if (!question || question.trim() === '') {
+      return res.json({ answer: 'Please ask me a specific question about farming, and I\'ll be happy to help!' });
+    }
+    
+    // Use the AI service to generate intelligent responses
+    const aiService = require('./aiService');
+    const answer = await aiService.generateResponse(question.trim(), conversationHistory);
+    
+    console.log(`Question: ${question}`);
+    console.log(`Answer generated successfully`);
+    
     res.json({ answer });
   } catch (err) {
     console.error('Error in /ask:', err);
-    res.status(500).json({ answer: 'Sorry, something went wrong on the server.' });
+    
+    // Fallback to basic response if AI fails
+    const aiService = require('./aiService');
+    const fallbackAnswer = aiService.getFallbackResponse(req.body.question || '');
+    
+    res.json({ 
+      answer: fallbackAnswer,
+      note: 'This is a basic response due to technical issues. Full AI functionality will be restored shortly.'
+    });
   }
 });
 

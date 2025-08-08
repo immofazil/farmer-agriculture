@@ -138,7 +138,7 @@ body {
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  opacity: 0;
+  opacity: 0.7;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -147,6 +147,7 @@ body {
 
 .chat-item:hover .delete-chat-btn {
   opacity: 1;
+  color: #ff6b6b;
 }
 
 .chat-item.active .delete-chat-btn {

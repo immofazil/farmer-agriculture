@@ -345,18 +345,32 @@
         const typingId = this.addTypingIndicator();
 
         try {
+          // Get current chat for conversation history
+          const currentChat = this.chats.find(c => c.id === this.currentChatId);
+          const conversationHistory = currentChat ? currentChat.messages : [];
+          
           const response = await fetch('/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question: content })
+            body: JSON.stringify({ 
+              question: content,
+              conversationHistory: conversationHistory
+            })
           });
 
           const data = await response.json();
           this.removeTypingIndicator(typingId);
-          this.addMessage(data.answer || 'Sorry, I couldn\'t process your request.', false);
+          
+          // Show note if it's a fallback response
+          let answer = data.answer;
+          if (data.note) {
+            answer = `⚠️ ${data.note}\n\n${answer}`;
+          }
+          
+          this.addMessage(answer, false);
         } catch (error) {
           this.removeTypingIndicator(typingId);
-          this.addMessage('Sorry, there was an error connecting to the server.', false);
+          this.addMessage('Sorry, there was an error connecting to the server. Please check your internet connection and try again.', false);
         }
       }
 

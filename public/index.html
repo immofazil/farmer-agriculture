@@ -1,35 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Farmer AI Advisor</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="app-container">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><rect width='100%' height='100%' rx='20' fill='%23a8e063'/><text x='50%' y='54%' font-size='16' text-anchor='middle' fill='white' font-family='Segoe UI, Arial' dy='.3em'>AI</text></svg>" alt="AI" class="sidebar-avatar" />
+        <img src="logo-small.svg" alt="Farmer AI Logo" class="sidebar-avatar" />
         <div class="user-info">
           <h2>Farmer AI</h2>
           <span class="username" id="username">Welcome!</span>
         </div>
       </div>
-      
+
       <button class="new-chat-btn" id="newChatBtn">
         <span>+</span> New Chat
       </button>
-      
+
       <div class="chat-history" id="chatHistory">
         <!-- Chat history items will be added here -->
       </div>
-      
+
       <div class="sidebar-footer">
         <button class="logout-btn" id="logoutBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
           </svg>
           Logout
         </button>
@@ -44,25 +47,39 @@
             <div class="welcome-avatar">🤖</div>
             <div class="welcome-text">
               <h3>Welcome to Farmer AI Advisor!</h3>
-              <p>I'm here to help you with farming questions. Ask me about:</p>
-              <ul>
-                <li>🌾 Crop selection and timing</li>
-                <li>💧 Irrigation and water management</li>
-                <li>🌤️ Weather impact on farming</li>
-                <li>💰 Market conditions and pricing</li>
-                <li>🏛️ Government policies and subsidies</li>
-              </ul>
+              <p>I'm here to help you with farming questions. Click on any topic below to get started:</p>
+              <div class="topic-buttons">
+                <button class="topic-btn"
+                  onclick="chatManager.sendTopicMessage('Tell me about crop selection and timing')">
+                  🌾 Crop selection and timing
+                </button>
+                <button class="topic-btn"
+                  onclick="chatManager.sendTopicMessage('Help me with irrigation and water management')">
+                  💧 Irrigation and water management
+                </button>
+                <button class="topic-btn" onclick="chatManager.sendTopicMessage('How does weather impact farming?')">
+                  🌤️ Weather impact on farming
+                </button>
+                <button class="topic-btn"
+                  onclick="chatManager.sendTopicMessage('What are the current market conditions and pricing?')">
+                  💰 Market conditions and pricing
+                </button>
+                <button class="topic-btn"
+                  onclick="chatManager.sendTopicMessage('Tell me about government policies and subsidies for farmers')">
+                  🏛️ Government policies and subsidies
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        
+
         <div class="input-container">
           <form id="chatForm" class="chat-form">
             <div class="input-wrapper">
               <input type="text" id="messageInput" placeholder="Ask me anything about farming..." autocomplete="off" />
               <button type="submit" id="sendBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                 </svg>
               </button>
             </div>
@@ -134,7 +151,7 @@
           messages: [],
           createdAt: new Date().toISOString()
         };
-        
+
         this.chats.unshift(newChat);
         this.currentChatId = chatId;
         this.renderChatHistory();
@@ -154,28 +171,41 @@
 
       async deleteChat() {
         if (!this.pendingDeleteChatId) return;
-        
+
         const chatId = this.pendingDeleteChatId;
-        
+
+        // Delete from database if user is logged in
+        if (this.userId) {
+          try {
+            const response = await fetch(`/delete-chat/${this.userId}/${chatId}`, {
+              method: 'DELETE'
+            });
+            const result = await response.json();
+            if (!result.success) {
+              console.error('Failed to delete chat from database');
+            }
+          } catch (error) {
+            console.error('Error deleting chat from database:', error);
+          }
+        }
+
         // Remove from local array
         this.chats = this.chats.filter(chat => chat.id !== chatId);
-        
+
         // If deleted chat was current, select first available or create new
         if (this.currentChatId === chatId) {
           this.currentChatId = this.chats.length > 0 ? this.chats[0].id : null;
         }
-        
+
         // Update localStorage
         this.saveToLocalStorage();
-        
+
         // Re-render
         this.renderChatHistory();
         this.loadCurrentChat();
-        
+
         // Hide modal
         this.hideDeleteModal();
-        
-        // TODO: Delete from database when backend supports it
       }
 
       async loadCurrentChat() {
@@ -233,7 +263,7 @@
               }
             })
           });
-          
+
           const result = await response.json();
           if (!result.success) {
             console.error('Failed to save chat to database, falling back to localStorage');
@@ -253,23 +283,33 @@
       async loadChatHistory() {
         try {
           if (this.userId) {
-            // Try to load from database first
+            // Load from database (primary source)
             const response = await fetch(`/chat-history/${this.userId}`);
             const result = await response.json();
-            if (result.success && result.chats.length > 0) {
+            if (result.success) {
               this.chats = result.chats;
-              this.currentChatId = this.chats[0]?.id || null;
+              this.currentChatId = this.chats.length > 0 ? this.chats[0]?.id : null;
+
+              // Clear localStorage to prevent conflicts
+              localStorage.removeItem('farmerChats');
+              localStorage.removeItem('currentChatId');
             } else {
-              // Fallback to localStorage
-              this.chats = JSON.parse(localStorage.getItem('farmerChats')) || [];
+              // If database fails, use localStorage but migrate to database
+              const localChats = JSON.parse(localStorage.getItem('farmerChats')) || [];
+              this.chats = localChats;
               this.currentChatId = localStorage.getItem('currentChatId') || null;
+
+              // Migrate local chats to database
+              if (localChats.length > 0) {
+                await this.migrateLocalChatsToDatabase();
+              }
             }
           } else {
-            // Use localStorage as fallback
+            // Use localStorage only if no user ID
             this.chats = JSON.parse(localStorage.getItem('farmerChats')) || [];
             this.currentChatId = localStorage.getItem('currentChatId') || null;
           }
-          
+
           this.renderChatHistory();
           this.loadCurrentChat();
         } catch (error) {
@@ -282,19 +322,35 @@
         }
       }
 
+      async migrateLocalChatsToDatabase() {
+        if (!this.userId) return;
+
+        try {
+          for (const chat of this.chats) {
+            await this.saveChatToDatabase(chat);
+          }
+          // Clear localStorage after successful migration
+          localStorage.removeItem('farmerChats');
+          localStorage.removeItem('currentChatId');
+          console.log('Successfully migrated local chats to database');
+        } catch (error) {
+          console.error('Error migrating chats to database:', error);
+        }
+      }
+
       async sendMessage(content) {
         this.addMessage(content, true);
-        
+
         // Show typing indicator
         const typingId = this.addTypingIndicator();
-        
+
         try {
           const response = await fetch('/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: content })
           });
-          
+
           const data = await response.json();
           this.removeTypingIndicator(typingId);
           this.addMessage(data.answer || 'Sorry, I couldn\'t process your request.', false);
@@ -302,6 +358,14 @@
           this.removeTypingIndicator(typingId);
           this.addMessage('Sorry, there was an error connecting to the server.', false);
         }
+      }
+
+      async sendTopicMessage(message) {
+        // Set the input value and trigger send
+        const input = document.getElementById('messageInput');
+        input.value = message;
+        await this.sendMessage(message);
+        input.value = '';
       }
 
       addTypingIndicator() {
@@ -332,21 +396,31 @@
       renderMessages(messages) {
         const container = document.getElementById('chatMessages');
         container.innerHTML = '';
-        
+
         if (messages.length === 0) {
           container.innerHTML = `
             <div class="welcome-message">
               <div class="welcome-avatar">🤖</div>
               <div class="welcome-text">
                 <h3>Welcome to Farmer AI Advisor!</h3>
-                <p>I'm here to help you with farming questions. Ask me about:</p>
-                <ul>
-                  <li>🌾 Crop selection and timing</li>
-                  <li>💧 Irrigation and water management</li>
-                  <li>🌤️ Weather impact on farming</li>
-                  <li>💰 Market conditions and pricing</li>
-                  <li>🏛️ Government policies and subsidies</li>
-                </ul>
+                <p>I'm here to help you with farming questions. Click on any topic below to get started:</p>
+                <div class="topic-buttons">
+                  <button class="topic-btn" onclick="chatManager.sendTopicMessage('Tell me about crop selection and timing')">
+                    🌾 Crop selection and timing
+                  </button>
+                  <button class="topic-btn" onclick="chatManager.sendTopicMessage('Help me with irrigation and water management')">
+                    💧 Irrigation and water management
+                  </button>
+                  <button class="topic-btn" onclick="chatManager.sendTopicMessage('How does weather impact farming?')">
+                    🌤️ Weather impact on farming
+                  </button>
+                  <button class="topic-btn" onclick="chatManager.sendTopicMessage('What are the current market conditions and pricing?')">
+                    💰 Market conditions and pricing
+                  </button>
+                  <button class="topic-btn" onclick="chatManager.sendTopicMessage('Tell me about government policies and subsidies for farmers')">
+                    🏛️ Government policies and subsidies
+                  </button>
+                </div>
               </div>
             </div>
           `;
@@ -362,14 +436,14 @@
           `;
           container.appendChild(messageDiv);
         });
-        
+
         this.scrollToBottom();
       }
 
       renderChatHistory() {
         const container = document.getElementById('chatHistory');
         container.innerHTML = '';
-        
+
         this.chats.forEach(chat => {
           const chatDiv = document.createElement('div');
           chatDiv.className = `chat-item ${chat.id === this.currentChatId ? 'active' : ''}`;
@@ -403,7 +477,7 @@
 
       setupEventListeners() {
         document.getElementById('newChatBtn').onclick = () => this.createNewChat();
-        
+
         document.getElementById('chatForm').onsubmit = (e) => {
           e.preventDefault();
           const input = document.getElementById('messageInput');
@@ -416,6 +490,7 @@
 
         // Logout functionality
         document.getElementById('logoutBtn').onclick = () => {
+          // Clear all user-related data
           localStorage.removeItem('isLoggedIn');
           localStorage.removeItem('username');
           localStorage.removeItem('fullName');
@@ -423,6 +498,11 @@
           localStorage.removeItem('rememberMe');
           localStorage.removeItem('farmerChats');
           localStorage.removeItem('currentChatId');
+
+          // Clear chat manager state
+          this.chats = [];
+          this.currentChatId = null;
+
           window.location.href = '/login.html';
         };
       }
@@ -430,17 +510,17 @@
       setupModalListeners() {
         // Cancel button
         document.getElementById('cancelDelete').onclick = () => this.hideDeleteModal();
-        
+
         // Confirm delete button
         document.getElementById('confirmDelete').onclick = () => this.deleteChat();
-        
+
         // Close modal when clicking overlay
         document.getElementById('deleteModal').onclick = (e) => {
           if (e.target.id === 'deleteModal') {
             this.hideDeleteModal();
           }
         };
-        
+
         // Close modal with Escape key
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && document.getElementById('deleteModal').style.display === 'flex') {
@@ -454,4 +534,5 @@
     const chatManager = new ChatManager();
   </script>
 </body>
+
 </html>

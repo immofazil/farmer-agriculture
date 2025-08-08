@@ -212,16 +212,43 @@ class Database {
     return new Promise((resolve, reject) => {
       const { chatId, title, messages } = chatData;
       
-      this.db.run(
-        'INSERT OR REPLACE INTO chat_history (userId, chatId, title, messages) VALUES (?, ?, ?, ?)',
-        [userId, chatId, title, JSON.stringify(messages)],
-        function(err) {
+      // First check if chat exists
+      this.db.get(
+        'SELECT id FROM chat_history WHERE userId = ? AND chatId = ?',
+        [userId, chatId],
+        (err, row) => {
           if (err) {
             reject(err);
             return;
           }
           
-          resolve({ success: true, chatId: this.lastID });
+          if (row) {
+            // Update existing chat
+            this.db.run(
+              'UPDATE chat_history SET title = ?, messages = ? WHERE userId = ? AND chatId = ?',
+              [title, JSON.stringify(messages), userId, chatId],
+              function(err) {
+                if (err) {
+                  reject(err);
+                  return;
+                }
+                resolve({ success: true, chatId: chatId });
+              }
+            );
+          } else {
+            // Insert new chat
+            this.db.run(
+              'INSERT INTO chat_history (userId, chatId, title, messages) VALUES (?, ?, ?, ?)',
+              [userId, chatId, title, JSON.stringify(messages)],
+              function(err) {
+                if (err) {
+                  reject(err);
+                  return;
+                }
+                resolve({ success: true, chatId: chatId });
+              }
+            );
+          }
         }
       );
     });
@@ -247,6 +274,28 @@ class Database {
           }));
           
           resolve(chats);
+        }
+      );
+    });
+  }
+
+  // Delete chat for user
+  async deleteChat(userId, chatId) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'DELETE FROM chat_history WHERE userId = ? AND chatId = ?',
+        [userId, chatId],
+        function(err) {
+          if (err) {
+            reject(err);
+            return;
+          }
+          
+          resolve({ 
+            success: true, 
+            message: 'Chat deleted successfully',
+            deletedRows: this.changes
+          });
         }
       );
     });

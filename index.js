@@ -86,6 +86,17 @@ app.get('/chat-history/:userId', async (req, res) => {
   }
 });
 
+app.delete('/delete-chat/:userId/:chatId', async (req, res) => {
+  try {
+    const { userId, chatId } = req.params;
+    const result = await db.deleteChat(userId, chatId);
+    res.json(result);
+  } catch (error) {
+    console.error('Delete chat error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete chat' });
+  }
+});
+
 // POST endpoint for farmer questions (protected by frontend auth)
 app.post('/ask', (req, res) => {
   try {

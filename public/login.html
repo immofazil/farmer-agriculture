@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Farmer AI Advisor - Login</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="login.css">
   <style>
     .password-field {
@@ -40,7 +41,7 @@
     <div class="login-card">
       <div class="login-header">
         <div class="logo">
-          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><rect width='100%' height='100%' rx='30' fill='%23a8e063'/><text x='50%' y='54%' font-size='24' text-anchor='middle' fill='white' font-family='Segoe UI, Arial' dy='.3em'>AI</text></svg>" alt="AI" />
+          <img src="logo.svg" alt="Farmer AI Logo" />
         </div>
         <h1>Farmer AI Advisor</h1>
         <p>Your intelligent farming companion</p>
@@ -49,13 +50,13 @@
       <form id="loginForm" class="login-form">
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" required placeholder="Enter your username">
+          <input type="text" id="username" name="username" required placeholder="Enter your username" autocomplete="off">
         </div>
         
         <div class="form-group">
           <label for="password">Password</label>
           <div class="password-field">
-            <input type="password" id="password" name="password" required placeholder="Enter your password">
+            <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off">
             <button type="button" class="password-toggle" onclick="togglePassword('password')">👁️</button>
           </div>
         </div>

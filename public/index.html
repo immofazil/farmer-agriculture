@@ -14,6 +14,9 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
+        <button class="back-btn" onclick="goToDashboard()" title="Back to Dashboard">
+          ← Dashboard
+        </button>
         <img src="logo-small.svg" alt="Farmer AI Logo" class="sidebar-avatar" />
         <div class="user-info">
           <h2>Farmer AI</h2>
@@ -348,11 +351,11 @@
           // Get current chat for conversation history
           const currentChat = this.chats.find(c => c.id === this.currentChatId);
           const conversationHistory = currentChat ? currentChat.messages : [];
-          
+
           const response = await fetch('/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
               question: content,
               conversationHistory: conversationHistory
             })
@@ -360,13 +363,13 @@
 
           const data = await response.json();
           this.removeTypingIndicator(typingId);
-          
+
           // Show note if it's a fallback response
           let answer = data.answer;
           if (data.note) {
             answer = `⚠️ ${data.note}\n\n${answer}`;
           }
-          
+
           this.addMessage(answer, false);
         } catch (error) {
           this.removeTypingIndicator(typingId);
@@ -444,9 +447,15 @@
         messages.forEach(message => {
           const messageDiv = document.createElement('div');
           messageDiv.className = `message ${message.isUser ? 'user-message' : 'ai-message'}`;
+          
+          // For AI messages, render HTML formatting; for user messages, keep as text
+          const content = message.isUser ? 
+            this.escapeHtml(message.content) : 
+            message.content; // AI responses can contain HTML formatting
+          
           messageDiv.innerHTML = `
             <div class="message-avatar">${message.isUser ? '👨‍🌾' : '🤖'}</div>
-            <div class="message-content">${message.content}</div>
+            <div class="message-content">${content}</div>
           `;
           container.appendChild(messageDiv);
         });
@@ -487,6 +496,13 @@
       scrollToBottom() {
         const container = document.getElementById('chatMessages');
         container.scrollTop = container.scrollHeight;
+      }
+
+      // Escape HTML for user messages to prevent XSS
+      escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
       }
 
       setupEventListeners() {
@@ -542,6 +558,11 @@
           }
         });
       }
+    }
+
+    // Go back to dashboard
+    function goToDashboard() {
+      window.location.href = '/dashboard.html';
     }
 
     // Initialize the chat manager

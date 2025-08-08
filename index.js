@@ -4,9 +4,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const db = require('./database');
 
-// Debug: Check if OpenAI API key is loaded
-console.log('🔑 OpenAI API Key loaded:', process.env.OPENAI_API_KEY ? 'Yes (length: ' + process.env.OPENAI_API_KEY.length + ')' : 'No');
-console.log('🤖 AI Service will be used for responses');
+// Debug: Check if Gemini API key is loaded
+console.log('🔑 Gemini API Key loaded:', process.env.GEMINI_API_KEY ? 'Yes (length: ' + process.env.GEMINI_API_KEY.length + ')' : 'No');
+console.log('🤖 Gemini AI Service will be used for responses');
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -20,10 +20,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Root route to serve login page
+// Root route to serve dashboard for authenticated users, login for others
 app.get('/', (req, res) => {
-  console.log('Root route accessed, serving login page');
-  res.sendFile(__dirname + '/public/login.html');
+  console.log('Root route accessed, serving dashboard');
+  res.sendFile(__dirname + '/public/dashboard.html');
 });
 
 // Authentication routes

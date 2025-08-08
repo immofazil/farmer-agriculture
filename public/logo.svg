@@ -1,41 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
-  <!-- Background circle -->
-  <circle cx="30" cy="30" r="30" fill="#a8e063"/>
+  <!-- Robot body (circular base) -->
+  <circle cx="30" cy="45" r="12" fill="#2d5016" stroke="#1a3009" stroke-width="2"/>
   
-  <!-- Farm field background -->
-  <path d="M5 35 Q15 32 25 35 Q35 38 45 35 Q50 33 55 35 L55 55 L5 55 Z" fill="#8bc34a"/>
+  <!-- Farm fields on body -->
+  <path d="M20 45 Q25 42 30 45 Q35 48 40 45" fill="none" stroke="#8bc34a" stroke-width="2"/>
+  <path d="M22 48 Q27 45 32 48 Q37 51 42 48" fill="none" stroke="#8bc34a" stroke-width="2"/>
   
-  <!-- Wheat stalks -->
-  <g stroke="#2d5016" stroke-width="1.5" fill="none">
-    <!-- Left wheat stalk -->
-    <path d="M18 45 L18 25"/>
-    <path d="M16 27 Q18 26 20 27"/>
-    <path d="M16 30 Q18 29 20 30"/>
-    <path d="M16 33 Q18 32 20 33"/>
-    <path d="M16 36 Q18 35 20 36"/>
-    
-    <!-- Center wheat stalk -->
-    <path d="M30 47 L30 22"/>
-    <path d="M28 24 Q30 23 32 24"/>
-    <path d="M28 27 Q30 26 32 27"/>
-    <path d="M28 30 Q30 29 32 30"/>
-    <path d="M28 33 Q30 32 32 33"/>
-    <path d="M28 36 Q30 35 32 36"/>
-    
-    <!-- Right wheat stalk -->
-    <path d="M42 45 L42 25"/>
-    <path d="M40 27 Q42 26 44 27"/>
-    <path d="M40 30 Q42 29 44 30"/>
-    <path d="M40 33 Q42 32 44 33"/>
-    <path d="M40 36 Q42 35 44 36"/>
-  </g>
+  <!-- Plant symbol on chest -->
+  <path d="M30 40 L30 50" stroke="#a8e063" stroke-width="2"/>
+  <path d="M27 42 Q30 40 33 42" fill="none" stroke="#a8e063" stroke-width="2"/>
+  <path d="M27 44 Q30 42 33 44" fill="none" stroke="#a8e063" stroke-width="2"/>
   
-  <!-- AI text -->
-  <text x="30" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">AI</text>
+  <!-- Robot head (rectangular with rounded corners) -->
+  <rect x="22" y="15" width="16" height="12" rx="2" fill="#3f51b5" stroke="#2d5016" stroke-width="2"/>
   
-  <!-- Small decorative elements -->
-  <circle cx="12" cy="20" r="1.5" fill="#ffffff" opacity="0.8"/>
-  <circle cx="48" cy="18" r="1.5" fill="#ffffff" opacity="0.8"/>
-  <circle cx="15" cy="50" r="1" fill="#2d5016" opacity="0.6"/>
-  <circle cx="45" cy="52" r="1" fill="#2d5016" opacity="0.6"/>
+  <!-- Robot eyes -->
+  <circle cx="26" cy="21" r="2" fill="#ffc107"/>
+  <circle cx="34" cy="21" r="2" fill="#ffc107"/>
+  
+  <!-- Robot mouth -->
+  <rect x="28" y="24" width="4" height="1.5" rx="0.5" fill="#ffffff"/>
+  
+  <!-- Farmer hat -->
+  <ellipse cx="30" cy="15" rx="14" ry="3" fill="#2d5016"/>
+  <ellipse cx="30" cy="12" rx="12" ry="6" fill="#2d5016"/>
+  <rect x="20" y="13" width="20" height="2" fill="#ffc107"/>
+  
+  <!-- Hat brim -->
+  <ellipse cx="30" cy="15" rx="16" ry="2" fill="none" stroke="#2d5016" stroke-width="2"/>
+  
+  <!-- Robot arms -->
+  <rect x="15" y="30" width="6" height="8" rx="3" fill="#2d5016"/>
+  <rect x="39" y="30" width="6" height="8" rx="3" fill="#2d5016"/>
+  
+  <!-- Speech bubble -->
+  <ellipse cx="48" cy="20" rx="8" ry="5" fill="#ffc107"/>
+  <path d="M42 22 L45 25 L47 22" fill="#ffc107"/>
+  
+  <!-- Control panel on chest -->
+  <rect x="26" y="35" width="8" height="4" rx="1" fill="#ffffff" stroke="#2d5016"/>
+  <circle cx="28" cy="37" r="0.8" fill="#ffc107"/>
+  <circle cx="30" cy="37" r="0.8" fill="#ffc107"/>
+  <circle cx="32" cy="37" r="0.8" fill="#ffc107"/>
 </svg>

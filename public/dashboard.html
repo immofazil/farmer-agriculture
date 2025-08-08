@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmBot - Agricultural Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="logo-small.svg" alt="FarmBot Logo" class="logo-icon">
+          <span class="logo-text">FarmBot</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-item active">
+          <span class="nav-icon">✨</span>
+          <span class="nav-text" data-translate="new-chat">New Chat</span>
+        </div>
+        <div class="nav-item" onclick="openSettings()">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text" data-translate="settings">Settings</span>
+        </div>
+        <div class="nav-item" onclick="logout()">
+          <span class="nav-icon">↩️</span>
+          <span class="nav-text" data-translate="logout">Logout</span>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="previous-chats">
+          <h3 data-translate="previous-chats">Previous Chats</h3>
+          <div class="chat-list" id="chatList">
+            <!-- Previous chats will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Budget Management Section -->
+      <div class="card budget-card">
+        <h2 class="card-title" data-translate="budget-title">BUDGET MANAGEMENT</h2>
+        <div class="budget-content">
+          <div class="budget-overview">
+            <div class="budget-item">
+              <div class="budget-label" data-translate="total-budget">Total Budget</div>
+              <div class="budget-amount" id="totalBudget">₹50,000</div>
+            </div>
+            <div class="budget-item">
+              <div class="budget-label" data-translate="spent">Spent</div>
+              <div class="budget-amount spent" id="spentAmount">₹32,500</div>
+            </div>
+            <div class="budget-item">
+              <div class="budget-label" data-translate="remaining">Remaining</div>
+              <div class="budget-amount remaining" id="remainingAmount">₹17,500</div>
+            </div>
+          </div>
+          <div class="budget-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 65%"></div>
+            </div>
+            <div class="progress-text">65% <span data-translate="used">used</span></div>
+          </div>
+          <div class="budget-actions">
+            <button class="budget-btn add-expense" onclick="openExpenseModal()" data-translate="add-expense">+ Add Expense</button>
+            <button class="budget-btn view-details" onclick="viewBudgetDetails()" data-translate="view-details">View Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="bottom-row">
+        <!-- Weather Section -->
+        <div class="card weather-card">
+          <h2 class="card-title" data-translate="weather">Weather</h2>
+          <div class="weather-grid">
+            <div class="weather-day">
+              <div class="day-name">Tue</div>
+              <div class="weather-icon">☀️</div>
+              <div class="temp-high">17°</div>
+              <div class="temp-low">- 22°</div>
+            </div>
+            <div class="weather-day">
+              <div class="day-name">Wed</div>
+              <div class="weather-icon">⛅</div>
+              <div class="temp-high">20°</div>
+              <div class="temp-low">- 25°</div>
+            </div>
+            <div class="weather-day">
+              <div class="day-name">Thu</div>
+              <div class="weather-icon">🌤️</div>
+              <div class="temp-high">19°</div>
+              <div class="temp-low">- 28°</div>
+            </div>
+            <div class="weather-day">
+              <div class="day-name">Thu</div>
+              <div class="weather-icon">☀️</div>
+              <div class="temp-high">19°</div>
+              <div class="temp-low">- 23°</div>
+            </div>
+            <div class="weather-day">
+              <div class="day-name">Fri</div>
+              <div class="weather-icon">☀️</div>
+              <div class="temp-high">21°</div>
+              <div class="temp-low">- 21°</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Season Section -->
+        <div class="card season-card">
+          <h2 class="card-title" data-translate="season">Season</h2>
+          <div class="season-content">
+            <p data-translate="season-text">This is the best time to plant crops like Wheat, Barley and Oats</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chatbot Section -->
+      <div class="card chatbot-card" onclick="openChatbot()">
+        <h2 class="card-title" data-translate="chat-bot">Chat-bot</h2>
+        <div class="chatbot-input">
+          <input type="text" placeholder="Message FarmBot..." readonly data-translate-placeholder="message-placeholder">
+          <div class="chat-icon">💬</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div class="modal-overlay" id="expenseModal">
+    <div class="modal-content expense-modal">
+      <div class="modal-header">
+        <h2>💰 Add Expense</h2>
+        <button class="close-btn" onclick="closeExpenseModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="expenseCategory">Category</label>
+          <select id="expenseCategory">
+            <option value="seeds">Seeds</option>
+            <option value="fertilizer">Fertilizer</option>
+            <option value="pesticides">Pesticides</option>
+            <option value="equipment">Equipment</option>
+            <option value="labor">Labor</option>
+            <option value="irrigation">Irrigation</option>
+            <option value="fuel">Fuel</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="expenseAmount">Amount (₹)</label>
+          <input type="number" id="expenseAmount" placeholder="Enter amount">
+        </div>
+        <div class="form-group">
+          <label for="expenseDescription">Description</label>
+          <input type="text" id="expenseDescription" placeholder="Brief description">
+        </div>
+        <div class="form-group">
+          <label for="expenseDate">Date</label>
+          <input type="date" id="expenseDate">
+        </div>
+        <button class="save-btn" onclick="addExpense()">Add Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Details Modal -->
+  <div class="modal-overlay" id="budgetDetailsModal">
+    <div class="modal-content budget-details-modal">
+      <div class="modal-header">
+        <h2>📊 Budget Details</h2>
+        <button class="close-btn" onclick="closeBudgetDetailsModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="budget-summary">
+          <div class="summary-item">
+            <span>Total Budget:</span>
+            <span class="amount">₹50,000</span>
+          </div>
+          <div class="summary-item">
+            <span>Total Spent:</span>
+            <span class="amount spent">₹32,500</span>
+          </div>
+          <div class="summary-item">
+            <span>Remaining:</span>
+            <span class="amount remaining">₹17,500</span>
+          </div>
+        </div>
+        <div class="expense-breakdown">
+          <h3>Expense Breakdown</h3>
+          <div class="breakdown-chart" id="breakdownChart">
+            <!-- Chart will be generated here -->
+          </div>
+        </div>
+        <div class="recent-expenses">
+          <h3>Recent Expenses</h3>
+          <div class="expense-list" id="expenseList">
+            <!-- Recent expenses will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content settings-modal">
+      <div class="modal-header">
+        <h2>⚙️ Settings</h2>
+        <button class="close-btn" onclick="closeSettings()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="settings-tabs">
+          <button class="tab-btn active" onclick="switchTab('profile')">👤 Profile</button>
+          <button class="tab-btn" onclick="switchTab('preferences')">🎨 Preferences</button>
+          <button class="tab-btn" onclick="switchTab('notifications')">🔔 Notifications</button>
+          <button class="tab-btn" onclick="switchTab('farm')">🌾 Farm Info</button>
+          <button class="tab-btn" onclick="switchTab('language')">🌍 Language</button>
+          <button class="tab-btn" onclick="switchTab('data')">📊 Data</button>
+        </div>
+
+        <div class="settings-content">
+          <!-- Profile Tab -->
+          <div class="tab-content active" id="profile-tab">
+            <h3>Profile Information</h3>
+            <div class="form-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" placeholder="Enter your phone number">
+            </div>
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input type="text" id="location" placeholder="Enter your location">
+            </div>
+            <button class="save-btn" onclick="saveProfile()">Save Profile</button>
+          </div>
+
+          <!-- Preferences Tab -->
+          <div class="tab-content" id="preferences-tab">
+            <h3>App Preferences</h3>
+            <div class="form-group">
+              <label for="theme">Theme</label>
+              <select id="theme" onchange="changeTheme()">
+                <option value="default">Default (Teal)</option>
+                <option value="green">Green</option>
+                <option value="blue">Blue</option>
+                <option value="dark">Dark Mode</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="units">Temperature Units</label>
+              <select id="units" onchange="changeUnits()">
+                <option value="celsius">Celsius (°C)</option>
+                <option value="fahrenheit">Fahrenheit (°F)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="dateFormat">Date Format</label>
+              <select id="dateFormat" onchange="changeDateFormat()">
+                <option value="dd/mm/yyyy">DD/MM/YYYY</option>
+                <option value="mm/dd/yyyy">MM/DD/YYYY</option>
+                <option value="yyyy-mm-dd">YYYY-MM-DD</option>
+              </select>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="autoSave" onchange="toggleAutoSave()">
+                <span class="checkmark"></span>
+                Auto-save chat conversations
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="soundEffects" onchange="toggleSounds()">
+                <span class="checkmark"></span>
+                Enable sound effects
+              </label>
+            </div>
+          </div>
+
+          <!-- Notifications Tab -->
+          <div class="tab-content" id="notifications-tab">
+            <h3>Notification Settings</h3>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="weatherAlerts" onchange="toggleWeatherAlerts()">
+                <span class="checkmark"></span>
+                Weather alerts and warnings
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="cropReminders" onchange="toggleCropReminders()">
+                <span class="checkmark"></span>
+                Crop planting and harvesting reminders
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="marketUpdates" onchange="toggleMarketUpdates()">
+                <span class="checkmark"></span>
+                Market price updates
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" id="tipOfDay" onchange="toggleTipOfDay()">
+                <span class="checkmark"></span>
+                Daily farming tips
+              </label>
+            </div>
+            <div class="form-group">
+              <label for="notificationTime">Daily notification time</label>
+              <input type="time" id="notificationTime" onchange="setNotificationTime()">
+            </div>
+          </div>
+
+          <!-- Farm Info Tab -->
+          <div class="tab-content" id="farm-tab">
+            <h3>Farm Information</h3>
+            <div class="form-group">
+              <label for="farmName">Farm Name</label>
+              <input type="text" id="farmName" placeholder="Enter your farm name">
+            </div>
+            <div class="form-group">
+              <label for="farmSize">Farm Size (acres)</label>
+              <input type="number" id="farmSize" placeholder="Enter farm size">
+            </div>
+            <div class="form-group">
+              <label for="soilType">Primary Soil Type</label>
+              <select id="soilType">
+                <option value="">Select soil type</option>
+                <option value="clay">Clay</option>
+                <option value="sandy">Sandy</option>
+                <option value="loamy">Loamy</option>
+                <option value="silty">Silty</option>
+                <option value="peaty">Peaty</option>
+                <option value="chalky">Chalky</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="primaryCrops">Primary Crops</label>
+              <input type="text" id="primaryCrops" placeholder="e.g., Wheat, Rice, Corn">
+            </div>
+            <div class="form-group">
+              <label for="irrigationType">Irrigation Type</label>
+              <select id="irrigationType">
+                <option value="">Select irrigation type</option>
+                <option value="drip">Drip Irrigation</option>
+                <option value="sprinkler">Sprinkler System</option>
+                <option value="flood">Flood Irrigation</option>
+                <option value="furrow">Furrow Irrigation</option>
+                <option value="rainfed">Rain-fed</option>
+              </select>
+            </div>
+            <button class="save-btn" onclick="saveFarmInfo()">Save Farm Info</button>
+          </div>
+
+          <!-- Language Tab -->
+          <div class="tab-content" id="language-tab">
+            <h3>Language & Region</h3>
+            <div class="form-group">
+              <label for="appLanguage">App Language</label>
+              <select id="appLanguage" onchange="changeLanguage()">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="mr">मराठी (Marathi)</option>
+                <option value="gu">ગુજરાતી (Gujarati)</option>
+                <option value="bn">বাংলা (Bengali)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                <option value="ml">മലയാളം (Malayalam)</option>
+                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                <option value="ur">اردو (Urdu)</option>
+                <option value="es">Español (Spanish)</option>
+                <option value="fr">Français (French)</option>
+                <option value="pt">Português (Portuguese)</option>
+                <option value="ar">العربية (Arabic)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="region">Region/Country</label>
+              <select id="region" onchange="changeRegion()">
+                <option value="in">India</option>
+                <option value="us">United States</option>
+                <option value="br">Brazil</option>
+                <option value="cn">China</option>
+                <option value="au">Australia</option>
+                <option value="ca">Canada</option>
+                <option value="mx">Mexico</option>
+                <option value="ar">Argentina</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="timezone">Timezone</label>
+              <select id="timezone" onchange="changeTimezone()">
+                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                <option value="America/New_York">America/New_York (EST)</option>
+                <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                <option value="Europe/London">Europe/London (GMT)</option>
+                <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+                <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Data Tab -->
+          <div class="tab-content" id="data-tab">
+            <h3>Data Management</h3>
+            <div class="data-section">
+              <h4>Export Data</h4>
+              <p>Download your chat history and farm data</p>
+              <button class="action-btn export-btn" onclick="exportData()">📥 Export All Data</button>
+            </div>
+            <div class="data-section">
+              <h4>Import Data</h4>
+              <p>Import previously exported data</p>
+              <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData()">
+              <button class="action-btn import-btn" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+            </div>
+            <div class="data-section">
+              <h4>Clear Data</h4>
+              <p>Remove all chat history and reset settings</p>
+              <button class="action-btn clear-btn" onclick="clearAllData()">🗑️ Clear All Data</button>
+            </div>
+            <div class="data-section">
+              <h4>Account</h4>
+              <p>Manage your account settings</p>
+              <button class="action-btn danger-btn" onclick="deleteAccount()">❌ Delete Account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Authentication check
+    function checkAuth() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      if (isLoggedIn !== 'true') {
+        window.location.href = '/login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // Initialize authentication
+    if (!checkAuth()) {
+      throw new Error('Authentication required');
+    }
+
+    // Load previous chats
+    function loadPreviousChats() {
+      const chats = JSON.parse(localStorage.getItem('farmerChats')) || [];
+      const chatList = document.getElementById('chatList');
+      
+      if (chats.length === 0) {
+        const currentLang = localStorage.getItem('appLanguage') || 'en';
+        const noChatsText = translations[currentLang] ? translations[currentLang]['no-chats'] : 'No previous chats';
+        chatList.innerHTML = `<div class="no-chats">${noChatsText}</div>`;
+        return;
+      }
+
+      chatList.innerHTML = chats.slice(0, 5).map(chat => `
+        <div class="chat-item" onclick="openChat('${chat.id}')">
+          <div class="chat-title">${chat.title}</div>
+          <div class="chat-date">${new Date(chat.createdAt).toLocaleDateString()}</div>
+        </div>
+      `).join('');
+    }
+
+    // Open chatbot
+    function openChatbot() {
+      window.location.href = '/index.html';
+    }
+
+    // Open specific chat
+    function openChat(chatId) {
+      localStorage.setItem('currentChatId', chatId);
+      window.location.href = '/index.html';
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('username');
+      localStorage.removeItem('fullName');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('rememberMe');
+      window.location.href = '/login.html';
+    }
+
+    // Load weather data (mock data for now)
+    function loadWeatherData() {
+      // In a real app, this would fetch from a weather API
+      console.log('Weather data loaded');
+    }
+
+    // Language translations
+    const translations = {
+      en: {
+        'budget-title': 'BUDGET MANAGEMENT',
+        'total-budget': 'Total Budget',
+        'spent': 'Spent',
+        'remaining': 'Remaining',
+        'used': 'used',
+        'add-expense': '+ Add Expense',
+        'view-details': 'View Details',
+        'weather': 'Weather',
+        'season': 'Season',
+        'season-text': 'This is the best time to plant crops like Wheat, Barley and Oats',
+        'chat-bot': 'Chat-bot',
+        'message-placeholder': 'Message FarmBot...',
+        'new-chat': 'New Chat',
+        'settings': 'Settings',
+        'logout': 'Logout',
+        'previous-chats': 'Previous Chats',
+        'no-chats': 'No previous chats'
+      },
+      hi: {
+        'budget-title': 'बजट प्रबंधन',
+        'total-budget': 'कुल बजट',
+        'spent': 'खर्च किया गया',
+        'remaining': 'बचा हुआ',
+        'used': 'उपयोग किया गया',
+        'add-expense': '+ खर्च जोड़ें',
+        'view-details': 'विवरण देखें',
+        'weather': 'मौसम',
+        'season': 'मौसम',
+        'season-text': 'गेहूं, जौ और जई जैसी फसलों को लगाने का यह सबसे अच्छा समय है',
+        'chat-bot': 'चैट-बॉट',
+        'message-placeholder': 'FarmBot को संदेश भेजें...',
+        'new-chat': 'नई चैट',
+        'settings': 'सेटिंग्स',
+        'logout': 'लॉगआउट',
+        'previous-chats': 'पिछली चैट्स',
+        'no-chats': 'कोई पिछली चैट नहीं'
+      },
+      mr: {
+        'budget-title': 'बजेट व्यवस्थापन',
+        'total-budget': 'एकूण बजेट',
+        'spent': 'खर्च केलेले',
+        'remaining': 'उरलेले',
+        'used': 'वापरले',
+        'add-expense': '+ खर्च जोडा',
+        'view-details': 'तपशील पहा',
+        'weather': 'हवामान',
+        'season': 'हंगाम',
+        'season-text': 'गहू, जव आणि ओट्स सारखी पिके लावण्याची ही सर्वोत्तम वेळ आहे',
+        'chat-bot': 'चॅट-बॉट',
+        'message-placeholder': 'FarmBot ला संदेश पाठवा...',
+        'new-chat': 'नवीन चॅट',
+        'settings': 'सेटिंग्ज',
+        'logout': 'लॉगआउट',
+        'previous-chats': 'मागील चॅट्स',
+        'no-chats': 'मागील चॅट्स नाहीत'
+      },
+      gu: {
+        'budget-title': 'બજેટ મેનેજમેન્ટ',
+        'total-budget': 'કુલ બજેટ',
+        'spent': 'ખર્ચ કર્યું',
+        'remaining': 'બાકી',
+        'used': 'ઉપયોગ કર્યું',
+        'add-expense': '+ ખર્ચ ઉમેરો',
+        'view-details': 'વિગતો જુઓ',
+        'weather': 'હવામાન',
+        'season': 'મોસમ',
+        'season-text': 'ઘઉં, જવ અને ઓટ્સ જેવા પાકો વાવવાનો આ શ્રેષ્ઠ સમય છે',
+        'chat-bot': 'ચેટ-બોટ',
+        'message-placeholder': 'FarmBot ને સંદેશ મોકલો...',
+        'new-chat': 'નવી ચેટ',
+        'settings': 'સેટિંગ્સ',
+        'logout': 'લોગઆઉટ',
+        'previous-chats': 'અગાઉની ચેટ્સ',
+        'no-chats': 'અગાઉની ચેટ્સ નથી'
+      },
+      es: {
+        'budget-title': 'GESTIÓN DE PRESUPUESTO',
+        'total-budget': 'Presupuesto Total',
+        'spent': 'Gastado',
+        'remaining': 'Restante',
+        'used': 'usado',
+        'add-expense': '+ Agregar Gasto',
+        'view-details': 'Ver Detalles',
+        'weather': 'Clima',
+        'season': 'Temporada',
+        'season-text': 'Este es el mejor momento para plantar cultivos como trigo, cebada y avena',
+        'chat-bot': 'Chat-bot',
+        'message-placeholder': 'Mensaje a FarmBot...',
+        'new-chat': 'Nuevo Chat',
+        'settings': 'Configuración',
+        'logout': 'Cerrar Sesión',
+        'previous-chats': 'Chats Anteriores',
+        'no-chats': 'No hay chats anteriores'
+      }
+    };
+
+    // Settings functionality
+    let currentSettings = {
+      profile: {
+        fullName: localStorage.getItem('fullName') || '',
+        email: '',
+        phone: '',
+        location: ''
+      },
+      preferences: {
+        theme: localStorage.getItem('theme') || 'default',
+        units: localStorage.getItem('units') || 'celsius',
+        dateFormat: localStorage.getItem('dateFormat') || 'dd/mm/yyyy',
+        autoSave: localStorage.getItem('autoSave') === 'true',
+        soundEffects: localStorage.getItem('soundEffects') === 'true'
+      },
+      notifications: {
+        weatherAlerts: localStorage.getItem('weatherAlerts') !== 'false',
+        cropReminders: localStorage.getItem('cropReminders') !== 'false',
+        marketUpdates: localStorage.getItem('marketUpdates') !== 'false',
+        tipOfDay: localStorage.getItem('tipOfDay') !== 'false',
+        notificationTime: localStorage.getItem('notificationTime') || '08:00'
+      },
+      farm: {
+        farmName: localStorage.getItem('farmName') || '',
+        farmSize: localStorage.getItem('farmSize') || '',
+        soilType: localStorage.getItem('soilType') || '',
+        primaryCrops: localStorage.getItem('primaryCrops') || '',
+        irrigationType: localStorage.getItem('irrigationType') || ''
+      },
+      language: {
+        appLanguage: localStorage.getItem('appLanguage') || 'en',
+        region: localStorage.getItem('region') || 'in',
+        timezone: localStorage.getItem('timezone') || 'Asia/Kolkata'
+      }
+    };
+
+    function openSettings() {
+      document.getElementById('settingsModal').classList.add('active');
+      loadSettingsData();
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.remove('active');
+    }
+
+    function switchTab(tabName) {
+      // Remove active class from all tabs and content
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      // Add active class to clicked tab and corresponding content
+      event.target.classList.add('active');
+      document.getElementById(tabName + '-tab').classList.add('active');
+    }
+
+    function loadSettingsData() {
+      // Load profile data
+      document.getElementById('fullName').value = currentSettings.profile.fullName;
+      document.getElementById('email').value = currentSettings.profile.email;
+      document.getElementById('phone').value = currentSettings.profile.phone;
+      document.getElementById('location').value = currentSettings.profile.location;
+
+      // Load preferences
+      document.getElementById('theme').value = currentSettings.preferences.theme;
+      document.getElementById('units').value = currentSettings.preferences.units;
+      document.getElementById('dateFormat').value = currentSettings.preferences.dateFormat;
+      document.getElementById('autoSave').checked = currentSettings.preferences.autoSave;
+      document.getElementById('soundEffects').checked = currentSettings.preferences.soundEffects;
+
+      // Load notifications
+      document.getElementById('weatherAlerts').checked = currentSettings.notifications.weatherAlerts;
+      document.getElementById('cropReminders').checked = currentSettings.notifications.cropReminders;
+      document.getElementById('marketUpdates').checked = currentSettings.notifications.marketUpdates;
+      document.getElementById('tipOfDay').checked = currentSettings.notifications.tipOfDay;
+      document.getElementById('notificationTime').value = currentSettings.notifications.notificationTime;
+
+      // Load farm info
+      document.getElementById('farmName').value = currentSettings.farm.farmName;
+      document.getElementById('farmSize').value = currentSettings.farm.farmSize;
+      document.getElementById('soilType').value = currentSettings.farm.soilType;
+      document.getElementById('primaryCrops').value = currentSettings.farm.primaryCrops;
+      document.getElementById('irrigationType').value = currentSettings.farm.irrigationType;
+
+      // Load language settings
+      document.getElementById('appLanguage').value = currentSettings.language.appLanguage;
+      document.getElementById('region').value = currentSettings.language.region;
+      document.getElementById('timezone').value = currentSettings.language.timezone;
+    }
+
+    function saveProfile() {
+      currentSettings.profile.fullName = document.getElementById('fullName').value;
+      currentSettings.profile.email = document.getElementById('email').value;
+      currentSettings.profile.phone = document.getElementById('phone').value;
+      currentSettings.profile.location = document.getElementById('location').value;
+
+      // Save to localStorage
+      localStorage.setItem('fullName', currentSettings.profile.fullName);
+      localStorage.setItem('email', currentSettings.profile.email);
+      localStorage.setItem('phone', currentSettings.profile.phone);
+      localStorage.setItem('location', currentSettings.profile.location);
+
+      showNotification('Profile saved successfully!', 'success');
+    }
+
+    function changeTheme() {
+      const theme = document.getElementById('theme').value;
+      currentSettings.preferences.theme = theme;
+      localStorage.setItem('theme', theme);
+      applyTheme(theme);
+      showNotification('Theme changed successfully!', 'success');
+    }
+
+    function applyTheme(theme) {
+      const body = document.body;
+      body.className = body.className.replace(/theme-\w+/g, '');
+      
+      switch(theme) {
+        case 'green':
+          body.style.background = 'linear-gradient(135deg, #56ab2f 0%, #a8e063 100%)';
+          break;
+        case 'blue':
+          body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+          break;
+        case 'dark':
+          body.style.background = 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)';
+          break;
+        default:
+          body.style.background = 'linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)';
+      }
+    }
+
+    function changeUnits() {
+      const units = document.getElementById('units').value;
+      currentSettings.preferences.units = units;
+      localStorage.setItem('units', units);
+      showNotification('Temperature units changed!', 'success');
+    }
+
+    function changeDateFormat() {
+      const format = document.getElementById('dateFormat').value;
+      currentSettings.preferences.dateFormat = format;
+      localStorage.setItem('dateFormat', format);
+      showNotification('Date format changed!', 'success');
+    }
+
+    function toggleAutoSave() {
+      const autoSave = document.getElementById('autoSave').checked;
+      currentSettings.preferences.autoSave = autoSave;
+      localStorage.setItem('autoSave', autoSave);
+      showNotification('Auto-save ' + (autoSave ? 'enabled' : 'disabled'), 'success');
+    }
+
+    function toggleSounds() {
+      const sounds = document.getElementById('soundEffects').checked;
+      currentSettings.preferences.soundEffects = sounds;
+      localStorage.setItem('soundEffects', sounds);
+      showNotification('Sound effects ' + (sounds ? 'enabled' : 'disabled'), 'success');
+    }
+
+    function toggleWeatherAlerts() {
+      const alerts = document.getElementById('weatherAlerts').checked;
+      currentSettings.notifications.weatherAlerts = alerts;
+      localStorage.setItem('weatherAlerts', alerts);
+      showNotification('Weather alerts ' + (alerts ? 'enabled' : 'disabled'), 'success');
+    }
+
+    function toggleCropReminders() {
+      const reminders = document.getElementById('cropReminders').checked;
+      currentSettings.notifications.cropReminders = reminders;
+      localStorage.setItem('cropReminders', reminders);
+      showNotification('Crop reminders ' + (reminders ? 'enabled' : 'disabled'), 'success');
+    }
+
+    function toggleMarketUpdates() {
+      const updates = document.getElementById('marketUpdates').checked;
+      currentSettings.notifications.marketUpdates = updates;
+      localStorage.setItem('marketUpdates', updates);
+      showNotification('Market updates ' + (updates ? 'enabled' : 'disabled'), 'success');
+    }
+
+    function toggleTipOfDay() {
+      const tips = document.getElementById('tipOfDay').checked;
+      currentSettings.notifications.tipOfDay = tips;
+      localStorage.setItem('tipOfDay', tips);
+      showNotification('Daily tips ' + (tips ? 'enabled' : 'disabled'), 'success');
+    }
+
+    function setNotificationTime() {
+      const time = document.getElementById('notificationTime').value;
+      currentSettings.notifications.notificationTime = time;
+      localStorage.setItem('notificationTime', time);
+      showNotification('Notification time set to ' + time, 'success');
+    }
+
+    function saveFarmInfo() {
+      currentSettings.farm.farmName = document.getElementById('farmName').value;
+      currentSettings.farm.farmSize = document.getElementById('farmSize').value;
+      currentSettings.farm.soilType = document.getElementById('soilType').value;
+      currentSettings.farm.primaryCrops = document.getElementById('primaryCrops').value;
+      currentSettings.farm.irrigationType = document.getElementById('irrigationType').value;
+
+      // Save to localStorage
+      Object.keys(currentSettings.farm).forEach(key => {
+        localStorage.setItem(key, currentSettings.farm[key]);
+      });
+
+      showNotification('Farm information saved successfully!', 'success');
+    }
+
+    function changeLanguage() {
+      const language = document.getElementById('appLanguage').value;
+      currentSettings.language.appLanguage = language;
+      localStorage.setItem('appLanguage', language);
+      applyLanguage(language);
+      showNotification('Language changed successfully!', 'success');
+    }
+
+    function applyLanguage(language) {
+      const elements = document.querySelectorAll('[data-translate]');
+      elements.forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[language] && translations[language][key]) {
+          element.textContent = translations[language][key];
+        }
+      });
+
+      // Update placeholder text
+      const placeholder = document.querySelector('input[placeholder]');
+      if (placeholder && translations[language] && translations[language]['message-placeholder']) {
+        placeholder.placeholder = translations[language]['message-placeholder'];
+      }
+    }
+
+    function changeRegion() {
+      const region = document.getElementById('region').value;
+      currentSettings.language.region = region;
+      localStorage.setItem('region', region);
+      showNotification('Region updated successfully!', 'success');
+    }
+
+    function changeTimezone() {
+      const timezone = document.getElementById('timezone').value;
+      currentSettings.language.timezone = timezone;
+      localStorage.setItem('timezone', timezone);
+      showNotification('Timezone updated successfully!', 'success');
+    }
+
+    function exportData() {
+      const allData = {
+        settings: currentSettings,
+        chats: JSON.parse(localStorage.getItem('farmerChats')) || [],
+        timestamp: new Date().toISOString()
+      };
+
+      const dataStr = JSON.stringify(allData, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'farmbot-data-' + new Date().toISOString().split('T')[0] + '.json';
+      link.click();
+      
+      URL.revokeObjectURL(url);
+      showNotification('Data exported successfully!', 'success');
+    }
+
+    function importData() {
+      const file = document.getElementById('importFile').files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          
+          if (data.settings) {
+            Object.keys(data.settings).forEach(category => {
+              Object.keys(data.settings[category]).forEach(key => {
+                localStorage.setItem(key, data.settings[category][key]);
+              });
+            });
+          }
+          
+          if (data.chats) {
+            localStorage.setItem('farmerChats', JSON.stringify(data.chats));
+          }
+          
+          showNotification('Data imported successfully! Please reload the page.', 'success');
+          setTimeout(() => location.reload(), 2000);
+        } catch (error) {
+          showNotification('Error importing data. Please check the file format.', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAllData() {
+      if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+        // Clear all localStorage except login info
+        const keysToKeep = ['isLoggedIn', 'username', 'userId'];
+        const storage = {};
+        keysToKeep.forEach(key => {
+          if (localStorage.getItem(key)) {
+            storage[key] = localStorage.getItem(key);
+          }
+        });
+        
+        localStorage.clear();
+        
+        keysToKeep.forEach(key => {
+          if (storage[key]) {
+            localStorage.setItem(key, storage[key]);
+          }
+        });
+        
+        showNotification('All data cleared successfully!', 'success');
+        setTimeout(() => location.reload(), 1500);
+      }
+    }
+
+    function deleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This will permanently delete all your data and cannot be undone.')) {
+        if (confirm('This is your final warning. Are you absolutely sure?')) {
+          // In a real app, this would make an API call to delete the account
+          localStorage.clear();
+          showNotification('Account deleted. Redirecting to login...', 'info');
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 2000);
+        }
+      }
+    }
+
+    function showNotification(message, type = 'info') {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      // Style the notification
+      Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '12px 20px',
+        borderRadius: '8px',
+        color: 'white',
+        fontWeight: '500',
+        zIndex: '10000',
+        opacity: '0',
+        transform: 'translateX(100%)',
+        transition: 'all 0.3s ease'
+      });
+
+      // Set background color based on type
+      switch(type) {
+        case 'success':
+          notification.style.background = '#27ae60';
+          break;
+        case 'error':
+          notification.style.background = '#e74c3c';
+          break;
+        case 'warning':
+          notification.style.background = '#f39c12';
+          break;
+        default:
+          notification.style.background = '#3498db';
+      }
+
+      document.body.appendChild(notification);
+
+      // Animate in
+      setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('settingsModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeSettings();
+      }
+    });
+
+    // Budget Management
+    let budgetData = {
+      totalBudget: parseFloat(localStorage.getItem('totalBudget')) || 50000,
+      expenses: JSON.parse(localStorage.getItem('farmExpenses')) || [
+        { id: 1, category: 'seeds', amount: 15000, description: 'Wheat seeds', date: '2024-01-15' },
+        { id: 2, category: 'fertilizer', amount: 12000, description: 'NPK fertilizer', date: '2024-01-20' },
+        { id: 3, category: 'pesticides', amount: 5500, description: 'Insecticide spray', date: '2024-02-01' }
+      ]
+    };
+
+    function updateBudgetDisplay() {
+      const totalSpent = budgetData.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+      const remaining = budgetData.totalBudget - totalSpent;
+      const percentage = (totalSpent / budgetData.totalBudget) * 100;
+
+      document.getElementById('totalBudget').textContent = `₹${budgetData.totalBudget.toLocaleString()}`;
+      document.getElementById('spentAmount').textContent = `₹${totalSpent.toLocaleString()}`;
+      document.getElementById('remainingAmount').textContent = `₹${remaining.toLocaleString()}`;
+      document.getElementById('progressFill').style.width = `${percentage}%`;
+      document.querySelector('.progress-text').innerHTML = `${Math.round(percentage)}% <span data-translate="used">used</span>`;
+    }
+
+    function openExpenseModal() {
+      document.getElementById('expenseModal').classList.add('active');
+      document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+    }
+
+    function closeExpenseModal() {
+      document.getElementById('expenseModal').classList.remove('active');
+      // Clear form
+      document.getElementById('expenseCategory').value = 'seeds';
+      document.getElementById('expenseAmount').value = '';
+      document.getElementById('expenseDescription').value = '';
+    }
+
+    function addExpense() {
+      const category = document.getElementById('expenseCategory').value;
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
+      const description = document.getElementById('expenseDescription').value;
+      const date = document.getElementById('expenseDate').value;
+
+      if (!amount || amount <= 0) {
+        showNotification('Please enter a valid amount', 'error');
+        return;
+      }
+
+      if (!description.trim()) {
+        showNotification('Please enter a description', 'error');
+        return;
+      }
+
+      const newExpense = {
+        id: Date.now(),
+        category,
+        amount,
+        description,
+        date
+      };
+
+      budgetData.expenses.push(newExpense);
+      localStorage.setItem('farmExpenses', JSON.stringify(budgetData.expenses));
+      
+      updateBudgetDisplay();
+      closeExpenseModal();
+      showNotification('Expense added successfully!', 'success');
+    }
+
+    function viewBudgetDetails() {
+      document.getElementById('budgetDetailsModal').classList.add('active');
+      loadBudgetDetails();
+    }
+
+    function closeBudgetDetailsModal() {
+      document.getElementById('budgetDetailsModal').classList.remove('active');
+    }
+
+    function loadBudgetDetails() {
+      // Load expense breakdown
+      const categoryTotals = {};
+      budgetData.expenses.forEach(expense => {
+        categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+      });
+
+      const breakdownChart = document.getElementById('breakdownChart');
+      breakdownChart.innerHTML = '';
+      
+      Object.entries(categoryTotals).forEach(([category, amount]) => {
+        const percentage = (amount / budgetData.totalBudget) * 100;
+        const item = document.createElement('div');
+        item.className = 'breakdown-item';
+        item.innerHTML = `
+          <div class="breakdown-label">${category.charAt(0).toUpperCase() + category.slice(1)}</div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width: ${percentage}%"></div>
+          </div>
+          <div class="breakdown-amount">₹${amount.toLocaleString()}</div>
+        `;
+        breakdownChart.appendChild(item);
+      });
+
+      // Load recent expenses
+      const expenseList = document.getElementById('expenseList');
+      const recentExpenses = budgetData.expenses.slice(-5).reverse();
+      
+      expenseList.innerHTML = recentExpenses.map(expense => `
+        <div class="expense-item">
+          <div class="expense-info">
+            <div class="expense-desc">${expense.description}</div>
+            <div class="expense-meta">${expense.category} • ${new Date(expense.date).toLocaleDateString()}</div>
+          </div>
+          <div class="expense-amount">₹${expense.amount.toLocaleString()}</div>
+        </div>
+      `).join('');
+    }
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPreviousChats();
+      loadWeatherData();
+      updateBudgetDisplay();
+      
+      // Apply saved theme
+      if (currentSettings.preferences.theme) {
+        applyTheme(currentSettings.preferences.theme);
+      }
+
+      // Apply saved language
+      const savedLanguage = localStorage.getItem('appLanguage') || 'en';
+      if (savedLanguage !== 'en') {
+        applyLanguage(savedLanguage);
+      }
+    });
+  </script>
+</body>
+</html>

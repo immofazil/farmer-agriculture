@@ -26,7 +26,7 @@ MULTILINGUAL SUPPORT:
 - If the user asks in Hindi, respond in Hindi
 - If the user asks in English, respond in English
 - If the user asks in Spanish, respond in Spanish
-- Support all major languages including: Hindi, Marathi, Gujarati, Bengali, Tamil, Telugu, Kannada, Malayalam, Punjabi, Urdu, Spanish, French, Portuguese, Arabic, etc.
+- Support these languages: English, Hindi, Marathi, Gujarati, Spanish, and Arabic
 - Maintain technical accuracy while using language-appropriate farming terminology
 
 FORMATTING GUIDELINES:
@@ -82,13 +82,29 @@ Guidelines for responses:
 Always aim to be helpful, accurate, and supportive in your responses. If you're unsure about something specific to a particular region, suggest consulting local agricultural experts.`;
   }
 
-  async generateResponse(question, conversationHistory = []) {
+  async generateResponse(question, conversationHistory = [], userLocation = null, userProfile = null) {
     console.log('🤖 AI Service called with question:', question.substring(0, 50) + '...');
     console.log('🔑 API Key available:', process.env.GEMINI_API_KEY ? 'Yes' : 'No');
 
     try {
       // Prepare the conversation context
       let conversationContext = this.systemPrompt + '\n\n';
+      
+      // Add user profile and farm information context if available
+      if (userProfile) {
+        const profileContext = this.getUserProfileContext(userProfile);
+        if (profileContext) {
+          conversationContext += `USER PROFILE AND FARM INFORMATION:\n${profileContext}\n\n`;
+        }
+      }
+      
+      // Add weather and location context if available
+      if (userLocation) {
+        const weatherContext = await this.getWeatherContext(userLocation);
+        if (weatherContext) {
+          conversationContext += `CURRENT LOCATION AND WEATHER CONTEXT:\n${weatherContext}\n\n`;
+        }
+      }
       
       // Add conversation history if provided
       if (conversationHistory && conversationHistory.length > 0) {
@@ -147,6 +163,94 @@ Always aim to be helpful, accurate, and supportive in your responses. If you're 
       } else {
         return "⚠️ **Technical Issue**\n\nI'm experiencing a technical difficulty right now. Please try again in a moment.\n\n**If the problem persists:**\n• Wait a few minutes and retry\n• Try asking a different question\n• Contact support if issues continue";
       }
+    }
+  }
+
+  getUserProfileContext(userProfile) {
+    try {
+      let context = '';
+      
+      // Add profile information
+      if (userProfile.profile) {
+        const profile = userProfile.profile;
+        context += `Farmer Profile:\n`;
+        if (profile.fullName) context += `- Name: ${profile.fullName}\n`;
+        if (profile.location) context += `- Location: ${profile.location}\n`;
+        if (profile.email) context += `- Contact: ${profile.email}\n`;
+        if (profile.phone) context += `- Phone: ${profile.phone}\n`;
+        context += '\n';
+      }
+      
+      // Add farm information
+      if (userProfile.farm) {
+        const farm = userProfile.farm;
+        context += `Farm Information:\n`;
+        if (farm.farmName) context += `- Farm Name: ${farm.farmName}\n`;
+        if (farm.farmSize) context += `- Farm Size: ${farm.farmSize} acres\n`;
+        if (farm.soilType) context += `- Primary Soil Type: ${farm.soilType}\n`;
+        if (farm.primaryCrops) context += `- Primary Crops: ${farm.primaryCrops}\n`;
+        if (farm.irrigationType) context += `- Irrigation Type: ${farm.irrigationType}\n`;
+        context += '\n';
+      }
+      
+      // Add budget information if available
+      if (userProfile.budget) {
+        const budget = userProfile.budget;
+        context += `Budget Information:\n`;
+        if (budget.totalBudget) context += `- Total Budget: ₹${budget.totalBudget.toLocaleString()}\n`;
+        if (budget.period) context += `- Budget Period: ${budget.period}\n`;
+        if (budget.expenses && budget.expenses.length > 0) {
+          const totalSpent = budget.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+          const remaining = budget.totalBudget - totalSpent;
+          context += `- Total Spent: ₹${totalSpent.toLocaleString()}\n`;
+          context += `- Remaining Budget: ₹${remaining.toLocaleString()}\n`;
+        }
+        context += '\n';
+      }
+      
+      if (context) {
+        context += `IMPORTANT: Use this profile and farm information to provide personalized farming advice. Consider the farmer's specific crops, soil type, farm size, irrigation method, and budget when making recommendations. Tailor your advice to their specific situation and needs.`;
+      }
+      
+      return context;
+    } catch (error) {
+      console.error('Error getting user profile context:', error);
+      return null;
+    }
+  }
+
+  async getWeatherContext(location) {
+    try {
+      const weatherService = require('./weatherService');
+      
+      // Get current weather
+      const currentWeather = await weatherService.getCurrentWeather(location.lat, location.lon);
+      const forecast = await weatherService.getForecast(location.lat, location.lon);
+      const alerts = await weatherService.getWeatherAlerts(location.lat, location.lon);
+      
+      let context = `User Location: ${location.city || 'Unknown'}, ${location.country || 'Unknown'} (${location.lat}, ${location.lon})\n`;
+      
+      if (currentWeather.success) {
+        context += weatherService.formatWeatherForAI(currentWeather, location.city);
+        context += '\n\n';
+      }
+      
+      if (forecast.success) {
+        context += weatherService.formatForecastForAI(forecast);
+        context += '\n';
+      }
+      
+      if (alerts.success) {
+        context += weatherService.formatAlertsForAI(alerts);
+        context += '\n';
+      }
+      
+      context += `\nIMPORTANT: Use this weather and location information to provide location-specific farming advice. Consider the current weather conditions, forecast, and any alerts when giving recommendations about planting, harvesting, irrigation, or other farming activities.`;
+      
+      return context;
+    } catch (error) {
+      console.error('Error getting weather context:', error);
+      return null;
     }
   }
 

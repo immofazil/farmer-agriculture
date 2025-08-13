@@ -352,12 +352,21 @@
           const currentChat = this.chats.find(c => c.id === this.currentChatId);
           const conversationHistory = currentChat ? currentChat.messages : [];
 
+          // Get user location from localStorage
+          const userLocation = localStorage.getItem('userLocation') ?
+            JSON.parse(localStorage.getItem('userLocation')) : null;
+
+          // Get user profile and farm information from localStorage
+          const userProfile = this.getUserProfile();
+
           const response = await fetch('/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               question: content,
-              conversationHistory: conversationHistory
+              conversationHistory: conversationHistory,
+              userLocation: userLocation,
+              userProfile: userProfile
             })
           });
 
@@ -447,12 +456,12 @@
         messages.forEach(message => {
           const messageDiv = document.createElement('div');
           messageDiv.className = `message ${message.isUser ? 'user-message' : 'ai-message'}`;
-          
+
           // For AI messages, render HTML formatting; for user messages, keep as text
-          const content = message.isUser ? 
-            this.escapeHtml(message.content) : 
+          const content = message.isUser ?
+            this.escapeHtml(message.content) :
             message.content; // AI responses can contain HTML formatting
-          
+
           messageDiv.innerHTML = `
             <div class="message-avatar">${message.isUser ? '👨‍🌾' : '🤖'}</div>
             <div class="message-content">${content}</div>
@@ -557,6 +566,47 @@
             this.hideDeleteModal();
           }
         });
+      }
+
+      // Get user profile and farm information from localStorage
+      getUserProfile() {
+        try {
+          const profile = {
+            profile: {
+              fullName: localStorage.getItem('fullName') || '',
+              email: localStorage.getItem('email') || '',
+              phone: localStorage.getItem('phone') || '',
+              location: localStorage.getItem('location') || ''
+            },
+            farm: {
+              farmName: localStorage.getItem('farmName') || '',
+              farmSize: localStorage.getItem('farmSize') || '',
+              soilType: localStorage.getItem('soilType') || '',
+              primaryCrops: localStorage.getItem('primaryCrops') || '',
+              irrigationType: localStorage.getItem('irrigationType') || ''
+            },
+            budget: {
+              totalBudget: parseFloat(localStorage.getItem('totalBudget')) || 0,
+              period: localStorage.getItem('budgetInfo') ? 
+                JSON.parse(localStorage.getItem('budgetInfo')).period : '',
+              expenses: JSON.parse(localStorage.getItem('farmExpenses')) || []
+            }
+          };
+
+          // Only return profile if at least some information is available
+          const hasProfileInfo = Object.values(profile.profile).some(value => value !== '');
+          const hasFarmInfo = Object.values(profile.farm).some(value => value !== '');
+          const hasBudgetInfo = profile.budget.totalBudget > 0;
+
+          if (hasProfileInfo || hasFarmInfo || hasBudgetInfo) {
+            return profile;
+          }
+
+          return null;
+        } catch (error) {
+          console.error('Error getting user profile:', error);
+          return null;
+        }
       }
     }
 

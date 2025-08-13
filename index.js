@@ -102,31 +102,69 @@ app.delete('/delete-chat/:userId/:chatId', async (req, res) => {
   }
 });
 
+// Weather API endpoints
+app.get('/weather/current/:lat/:lon', async (req, res) => {
+  try {
+    const { lat, lon } = req.params;
+    const weatherService = require('./weatherService');
+    const weather = await weatherService.getCurrentWeather(parseFloat(lat), parseFloat(lon));
+    res.json(weather);
+  } catch (error) {
+    console.error('Weather API error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch weather data' });
+  }
+});
+
+app.get('/weather/forecast/:lat/:lon', async (req, res) => {
+  try {
+    const { lat, lon } = req.params;
+    const weatherService = require('./weatherService');
+    const forecast = await weatherService.getForecast(parseFloat(lat), parseFloat(lon));
+    res.json(forecast);
+  } catch (error) {
+    console.error('Forecast API error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch forecast data' });
+  }
+});
+
+app.get('/weather/alerts/:lat/:lon', async (req, res) => {
+  try {
+    const { lat, lon } = req.params;
+    const weatherService = require('./weatherService');
+    const alerts = await weatherService.getWeatherAlerts(parseFloat(lat), parseFloat(lon));
+    res.json(alerts);
+  } catch (error) {
+    console.error('Weather alerts API error:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch weather alerts' });
+  }
+});
+
 // POST endpoint for farmer questions with AI integration
 app.post('/ask', async (req, res) => {
   try {
-    const { question, conversationHistory } = req.body;
-    
+    const { question, conversationHistory, userLocation, userProfile } = req.body;
+
     if (!question || question.trim() === '') {
       return res.json({ answer: 'Please ask me a specific question about farming, and I\'ll be happy to help!' });
     }
-    
-    // Use the AI service to generate intelligent responses
+
+    // Use the AI service to generate intelligent responses with user profile context
     const aiService = require('./aiService');
-    const answer = await aiService.generateResponse(question.trim(), conversationHistory);
-    
+    const answer = await aiService.generateResponse(question.trim(), conversationHistory, userLocation, userProfile);
+
     console.log(`Question: ${question}`);
+    console.log(`User Profile included:`, userProfile ? 'Yes' : 'No');
     console.log(`Answer generated successfully`);
-    
+
     res.json({ answer });
   } catch (err) {
     console.error('Error in /ask:', err);
-    
+
     // Fallback to basic response if AI fails
     const aiService = require('./aiService');
     const fallbackAnswer = aiService.getFallbackResponse(req.body.question || '');
-    
-    res.json({ 
+
+    res.json({
       answer: fallbackAnswer,
       note: 'This is a basic response due to technical issues. Full AI functionality will be restored shortly.'
     });

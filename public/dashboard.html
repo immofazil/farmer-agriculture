@@ -70,6 +70,7 @@
             <div class="progress-text">65% <span data-translate="used">used</span></div>
           </div>
           <div class="budget-actions">
+            <button class="budget-btn set-budget" onclick="openBudgetModal()" data-translate="set-budget">💰 Set Budget</button>
             <button class="budget-btn add-expense" onclick="openExpenseModal()" data-translate="add-expense">+ Add Expense</button>
             <button class="budget-btn view-details" onclick="viewBudgetDetails()" data-translate="view-details">View Details</button>
           </div>
@@ -83,31 +84,31 @@
           <h2 class="card-title" data-translate="weather">Weather</h2>
           <div class="weather-grid">
             <div class="weather-day">
-              <div class="day-name">Tue</div>
+              <div class="day-name" data-translate="tue">Tue</div>
               <div class="weather-icon">☀️</div>
               <div class="temp-high">17°</div>
               <div class="temp-low">- 22°</div>
             </div>
             <div class="weather-day">
-              <div class="day-name">Wed</div>
+              <div class="day-name" data-translate="wed">Wed</div>
               <div class="weather-icon">⛅</div>
               <div class="temp-high">20°</div>
               <div class="temp-low">- 25°</div>
             </div>
             <div class="weather-day">
-              <div class="day-name">Thu</div>
+              <div class="day-name" data-translate="thu">Thu</div>
               <div class="weather-icon">🌤️</div>
               <div class="temp-high">19°</div>
               <div class="temp-low">- 28°</div>
             </div>
             <div class="weather-day">
-              <div class="day-name">Thu</div>
+              <div class="day-name" data-translate="thu">Thu</div>
               <div class="weather-icon">☀️</div>
               <div class="temp-high">19°</div>
               <div class="temp-low">- 23°</div>
             </div>
             <div class="weather-day">
-              <div class="day-name">Fri</div>
+              <div class="day-name" data-translate="fri">Fri</div>
               <div class="weather-icon">☀️</div>
               <div class="temp-high">21°</div>
               <div class="temp-low">- 21°</div>
@@ -115,11 +116,22 @@
           </div>
         </div>
 
-        <!-- Season Section -->
-        <div class="card season-card">
-          <h2 class="card-title" data-translate="season">Season</h2>
-          <div class="season-content">
-            <p data-translate="season-text">This is the best time to plant crops like Wheat, Barley and Oats</p>
+        <!-- Warnings Section -->
+        <div class="card warnings-card">
+          <h2 class="card-title" data-translate="warnings">⚠️ Weather Warnings</h2>
+          <div class="warnings-content" id="warningsContent">
+            <div class="warning-item active" id="activeWarning">
+              <div class="warning-icon">🌧️</div>
+              <div class="warning-info">
+                <div class="warning-title" data-translate="heavy-rain">Heavy Rain Alert</div>
+                <div class="warning-desc">Expected rainfall: 50-75mm in next 24 hours</div>
+                <div class="warning-time">Valid until: Tomorrow 6 PM</div>
+              </div>
+            </div>
+            <div class="no-warnings" id="noWarnings" style="display: none;">
+              <div class="no-warnings-icon">✅</div>
+              <div class="no-warnings-text" data-translate="no-warnings">No active weather warnings</div>
+            </div>
           </div>
         </div>
       </div>
@@ -131,6 +143,40 @@
           <input type="text" placeholder="Message FarmBot..." readonly data-translate-placeholder="message-placeholder">
           <div class="chat-icon">💬</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Setting Modal -->
+  <div class="modal-overlay" id="budgetModal">
+    <div class="modal-content budget-modal">
+      <div class="modal-header">
+        <h2>💰 Set Budget</h2>
+        <button class="close-btn" onclick="closeBudgetModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="newBudgetAmount">Total Budget Amount (₹)</label>
+          <input type="number" id="newBudgetAmount" placeholder="Enter your total budget" min="1000" step="500">
+        </div>
+        <div class="form-group">
+          <label for="budgetPeriod">Budget Period</label>
+          <select id="budgetPeriod">
+            <option value="monthly">Monthly</option>
+            <option value="seasonal">Seasonal (3 months)</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+        <div class="budget-suggestions">
+          <h4>Quick Budget Suggestions:</h4>
+          <div class="suggestion-buttons">
+            <button class="suggestion-btn" onclick="setBudgetAmount(25000)">₹25,000</button>
+            <button class="suggestion-btn" onclick="setBudgetAmount(50000)">₹50,000</button>
+            <button class="suggestion-btn" onclick="setBudgetAmount(100000)">₹1,00,000</button>
+            <button class="suggestion-btn" onclick="setBudgetAmount(200000)">₹2,00,000</button>
+          </div>
+        </div>
+        <button class="save-btn" onclick="saveBudget()">Set Budget</button>
       </div>
     </div>
   </div>
@@ -202,7 +248,12 @@
           </div>
         </div>
         <div class="recent-expenses">
-          <h3>Recent Expenses</h3>
+          <div class="expenses-header">
+            <h3>Recent Expenses</h3>
+            <button class="clear-all-btn" onclick="clearAllExpenses()" title="Clear all expenses">
+              🗑️ Clear All
+            </button>
+          </div>
           <div class="expense-list" id="expenseList">
             <!-- Recent expenses will be loaded here -->
           </div>
@@ -222,11 +273,9 @@
       <div class="modal-body">
         <div class="settings-tabs">
           <button class="tab-btn active" onclick="switchTab('profile')">👤 Profile</button>
-          <button class="tab-btn" onclick="switchTab('preferences')">🎨 Preferences</button>
           <button class="tab-btn" onclick="switchTab('notifications')">🔔 Notifications</button>
           <button class="tab-btn" onclick="switchTab('farm')">🌾 Farm Info</button>
           <button class="tab-btn" onclick="switchTab('language')">🌍 Language</button>
-          <button class="tab-btn" onclick="switchTab('data')">📊 Data</button>
         </div>
 
         <div class="settings-content">
@@ -250,49 +299,6 @@
               <input type="text" id="location" placeholder="Enter your location">
             </div>
             <button class="save-btn" onclick="saveProfile()">Save Profile</button>
-          </div>
-
-          <!-- Preferences Tab -->
-          <div class="tab-content" id="preferences-tab">
-            <h3>App Preferences</h3>
-            <div class="form-group">
-              <label for="theme">Theme</label>
-              <select id="theme" onchange="changeTheme()">
-                <option value="default">Default (Teal)</option>
-                <option value="green">Green</option>
-                <option value="blue">Blue</option>
-                <option value="dark">Dark Mode</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="units">Temperature Units</label>
-              <select id="units" onchange="changeUnits()">
-                <option value="celsius">Celsius (°C)</option>
-                <option value="fahrenheit">Fahrenheit (°F)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="dateFormat">Date Format</label>
-              <select id="dateFormat" onchange="changeDateFormat()">
-                <option value="dd/mm/yyyy">DD/MM/YYYY</option>
-                <option value="mm/dd/yyyy">MM/DD/YYYY</option>
-                <option value="yyyy-mm-dd">YYYY-MM-DD</option>
-              </select>
-            </div>
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" id="autoSave" onchange="toggleAutoSave()">
-                <span class="checkmark"></span>
-                Auto-save chat conversations
-              </label>
-            </div>
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" id="soundEffects" onchange="toggleSounds()">
-                <span class="checkmark"></span>
-                Enable sound effects
-              </label>
-            </div>
           </div>
 
           <!-- Notifications Tab -->
@@ -375,7 +381,7 @@
 
           <!-- Language Tab -->
           <div class="tab-content" id="language-tab">
-            <h3>Language & Region</h3>
+            <h3>Language Settings</h3>
             <div class="form-group">
               <label for="appLanguage">App Language</label>
               <select id="appLanguage" onchange="changeLanguage()">
@@ -383,71 +389,21 @@
                 <option value="hi">हिंदी (Hindi)</option>
                 <option value="mr">मराठी (Marathi)</option>
                 <option value="gu">ગુજરાતી (Gujarati)</option>
-                <option value="bn">বাংলা (Bengali)</option>
-                <option value="ta">தமிழ் (Tamil)</option>
-                <option value="te">తెలుగు (Telugu)</option>
-                <option value="kn">ಕನ್ನಡ (Kannada)</option>
-                <option value="ml">മലയാളം (Malayalam)</option>
-                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-                <option value="ur">اردو (Urdu)</option>
                 <option value="es">Español (Spanish)</option>
-                <option value="fr">Français (French)</option>
-                <option value="pt">Português (Portuguese)</option>
                 <option value="ar">العربية (Arabic)</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="region">Region/Country</label>
-              <select id="region" onchange="changeRegion()">
-                <option value="in">India</option>
-                <option value="us">United States</option>
-                <option value="br">Brazil</option>
-                <option value="cn">China</option>
-                <option value="au">Australia</option>
-                <option value="ca">Canada</option>
-                <option value="mx">Mexico</option>
-                <option value="ar">Argentina</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="timezone">Timezone</label>
-              <select id="timezone" onchange="changeTimezone()">
-                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                <option value="America/New_York">America/New_York (EST)</option>
-                <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
-                <option value="Europe/London">Europe/London (GMT)</option>
-                <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
-                <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
-              </select>
+              <label for="currentLocation">Current Location</label>
+              <div class="location-display" id="locationDisplay">
+                <span id="locationText">Detecting location...</span>
+                <button type="button" class="refresh-location-btn" onclick="refreshLocation()">🔄 Refresh</button>
+              </div>
+              <small class="location-help">Location is automatically detected using GPS for accurate weather data</small>
             </div>
           </div>
 
-          <!-- Data Tab -->
-          <div class="tab-content" id="data-tab">
-            <h3>Data Management</h3>
-            <div class="data-section">
-              <h4>Export Data</h4>
-              <p>Download your chat history and farm data</p>
-              <button class="action-btn export-btn" onclick="exportData()">📥 Export All Data</button>
-            </div>
-            <div class="data-section">
-              <h4>Import Data</h4>
-              <p>Import previously exported data</p>
-              <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData()">
-              <button class="action-btn import-btn" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
-            </div>
-            <div class="data-section">
-              <h4>Clear Data</h4>
-              <p>Remove all chat history and reset settings</p>
-              <button class="action-btn clear-btn" onclick="clearAllData()">🗑️ Clear All Data</button>
-            </div>
-            <div class="data-section">
-              <h4>Account</h4>
-              <p>Manage your account settings</p>
-              <button class="action-btn danger-btn" onclick="deleteAccount()">❌ Delete Account</button>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -476,7 +432,8 @@
       
       if (chats.length === 0) {
         const currentLang = localStorage.getItem('appLanguage') || 'en';
-        const noChatsText = translations[currentLang] ? translations[currentLang]['no-chats'] : 'No previous chats';
+        const noChatsText = translations[currentLang] && translations[currentLang]['no-chats'] ? 
+                           translations[currentLang]['no-chats'] : 'No previous chats';
         chatList.innerHTML = `<div class="no-chats">${noChatsText}</div>`;
         return;
       }
@@ -524,18 +481,27 @@
         'spent': 'Spent',
         'remaining': 'Remaining',
         'used': 'used',
+        'set-budget': '💰 Set Budget',
         'add-expense': '+ Add Expense',
         'view-details': 'View Details',
         'weather': 'Weather',
-        'season': 'Season',
-        'season-text': 'This is the best time to plant crops like Wheat, Barley and Oats',
+        'warnings': '⚠️ Weather Warnings',
         'chat-bot': 'Chat-bot',
         'message-placeholder': 'Message FarmBot...',
         'new-chat': 'New Chat',
         'settings': 'Settings',
         'logout': 'Logout',
         'previous-chats': 'Previous Chats',
-        'no-chats': 'No previous chats'
+        'no-chats': 'No previous chats',
+        'no-warnings': 'No active weather warnings',
+        'heavy-rain': 'Heavy Rain Alert',
+        'tue': 'Tue',
+        'wed': 'Wed',
+        'thu': 'Thu',
+        'fri': 'Fri',
+        'sat': 'Sat',
+        'sun': 'Sun',
+        'mon': 'Mon'
       },
       hi: {
         'budget-title': 'बजट प्रबंधन',
@@ -543,18 +509,27 @@
         'spent': 'खर्च किया गया',
         'remaining': 'बचा हुआ',
         'used': 'उपयोग किया गया',
+        'set-budget': '💰 बजट सेट करें',
         'add-expense': '+ खर्च जोड़ें',
         'view-details': 'विवरण देखें',
         'weather': 'मौसम',
-        'season': 'मौसम',
-        'season-text': 'गेहूं, जौ और जई जैसी फसलों को लगाने का यह सबसे अच्छा समय है',
+        'warnings': '⚠️ मौसम चेतावनी',
         'chat-bot': 'चैट-बॉट',
         'message-placeholder': 'FarmBot को संदेश भेजें...',
         'new-chat': 'नई चैट',
         'settings': 'सेटिंग्स',
         'logout': 'लॉगआउट',
         'previous-chats': 'पिछली चैट्स',
-        'no-chats': 'कोई पिछली चैट नहीं'
+        'no-chats': 'कोई पिछली चैट नहीं',
+        'no-warnings': 'कोई सक्रिय मौसम चेतावनी नहीं',
+        'heavy-rain': 'भारी बारिश की चेतावनी',
+        'tue': 'मंगल',
+        'wed': 'बुध',
+        'thu': 'गुरु',
+        'fri': 'शुक्र',
+        'sat': 'शनि',
+        'sun': 'रवि',
+        'mon': 'सोम'
       },
       mr: {
         'budget-title': 'बजेट व्यवस्थापन',
@@ -562,18 +537,27 @@
         'spent': 'खर्च केलेले',
         'remaining': 'उरलेले',
         'used': 'वापरले',
+        'set-budget': '💰 बजेट सेट करा',
         'add-expense': '+ खर्च जोडा',
         'view-details': 'तपशील पहा',
         'weather': 'हवामान',
-        'season': 'हंगाम',
-        'season-text': 'गहू, जव आणि ओट्स सारखी पिके लावण्याची ही सर्वोत्तम वेळ आहे',
+        'warnings': '⚠️ हवामान चेतावनी',
         'chat-bot': 'चॅट-बॉट',
         'message-placeholder': 'FarmBot ला संदेश पाठवा...',
         'new-chat': 'नवीन चॅट',
         'settings': 'सेटिंग्ज',
         'logout': 'लॉगआउट',
         'previous-chats': 'मागील चॅट्स',
-        'no-chats': 'मागील चॅट्स नाहीत'
+        'no-chats': 'मागील चॅट्स नाहीत',
+        'no-warnings': 'कोणत्याही सक्रिय हवामान चेतावनी नाहीत',
+        'heavy-rain': 'मुसळधार पावसाची चेतावनी',
+        'tue': 'मंगळ',
+        'wed': 'बुध',
+        'thu': 'गुरु',
+        'fri': 'शुक्र',
+        'sat': 'शनि',
+        'sun': 'रवि',
+        'mon': 'सोम'
       },
       gu: {
         'budget-title': 'બજેટ મેનેજમેન્ટ',
@@ -581,18 +565,27 @@
         'spent': 'ખર્ચ કર્યું',
         'remaining': 'બાકી',
         'used': 'ઉપયોગ કર્યું',
+        'set-budget': '💰 બજેટ સેટ કરો',
         'add-expense': '+ ખર્ચ ઉમેરો',
         'view-details': 'વિગતો જુઓ',
         'weather': 'હવામાન',
-        'season': 'મોસમ',
-        'season-text': 'ઘઉં, જવ અને ઓટ્સ જેવા પાકો વાવવાનો આ શ્રેષ્ઠ સમય છે',
+        'warnings': '⚠️ હવામાન ચેતવણી',
         'chat-bot': 'ચેટ-બોટ',
         'message-placeholder': 'FarmBot ને સંદેશ મોકલો...',
         'new-chat': 'નવી ચેટ',
         'settings': 'સેટિંગ્સ',
         'logout': 'લોગઆઉટ',
         'previous-chats': 'અગાઉની ચેટ્સ',
-        'no-chats': 'અગાઉની ચેટ્સ નથી'
+        'no-chats': 'અગાઉની ચેટ્સ નથી',
+        'no-warnings': 'કોઈ સક્રિય હવામાન ચેતવણી નથી',
+        'heavy-rain': 'ભારે વરસાદની ચેતવણી',
+        'tue': 'મંગળ',
+        'wed': 'બુધ',
+        'thu': 'ગુરુ',
+        'fri': 'શુક્ર',
+        'sat': 'શનિ',
+        'sun': 'રવિ',
+        'mon': 'સોમ'
       },
       es: {
         'budget-title': 'GESTIÓN DE PRESUPUESTO',
@@ -600,18 +593,55 @@
         'spent': 'Gastado',
         'remaining': 'Restante',
         'used': 'usado',
+        'set-budget': '💰 Establecer Presupuesto',
         'add-expense': '+ Agregar Gasto',
         'view-details': 'Ver Detalles',
         'weather': 'Clima',
-        'season': 'Temporada',
-        'season-text': 'Este es el mejor momento para plantar cultivos como trigo, cebada y avena',
+        'warnings': '⚠️ Alertas Meteorológicas',
         'chat-bot': 'Chat-bot',
         'message-placeholder': 'Mensaje a FarmBot...',
         'new-chat': 'Nuevo Chat',
         'settings': 'Configuración',
         'logout': 'Cerrar Sesión',
         'previous-chats': 'Chats Anteriores',
-        'no-chats': 'No hay chats anteriores'
+        'no-chats': 'No hay chats anteriores',
+        'no-warnings': 'No hay alertas meteorológicas activas',
+        'heavy-rain': 'Alerta de Lluvia Intensa',
+        'tue': 'Mar',
+        'wed': 'Mié',
+        'thu': 'Jue',
+        'fri': 'Vie',
+        'sat': 'Sáb',
+        'sun': 'Dom',
+        'mon': 'Lun'
+      },
+      ar: {
+        'budget-title': 'إدارة الميزانية',
+        'total-budget': 'إجمالي الميزانية',
+        'spent': 'المنفق',
+        'remaining': 'المتبقي',
+        'used': 'مستخدم',
+        'set-budget': '💰 تحديد الميزانية',
+        'add-expense': '+ إضافة مصروف',
+        'view-details': 'عرض التفاصيل',
+        'weather': 'الطقس',
+        'warnings': '⚠️ تحذيرات الطقس',
+        'chat-bot': 'روبوت المحادثة',
+        'message-placeholder': 'رسالة إلى FarmBot...',
+        'new-chat': 'محادثة جديدة',
+        'settings': 'الإعدادات',
+        'logout': 'تسجيل الخروج',
+        'previous-chats': 'المحادثات السابقة',
+        'no-chats': 'لا توجد محادثات سابقة',
+        'no-warnings': 'لا توجد تحذيرات طقس نشطة',
+        'heavy-rain': 'تحذير من الأمطار الغزيرة',
+        'tue': 'الثلاثاء',
+        'wed': 'الأربعاء',
+        'thu': 'الخميس',
+        'fri': 'الجمعة',
+        'sat': 'السبت',
+        'sun': 'الأحد',
+        'mon': 'الاثنين'
       }
     };
 
@@ -619,9 +649,9 @@
     let currentSettings = {
       profile: {
         fullName: localStorage.getItem('fullName') || '',
-        email: '',
-        phone: '',
-        location: ''
+        email: localStorage.getItem('email') || '',
+        phone: localStorage.getItem('phone') || '',
+        location: localStorage.getItem('location') || ''
       },
       preferences: {
         theme: localStorage.getItem('theme') || 'default',
@@ -645,9 +675,7 @@
         irrigationType: localStorage.getItem('irrigationType') || ''
       },
       language: {
-        appLanguage: localStorage.getItem('appLanguage') || 'en',
-        region: localStorage.getItem('region') || 'in',
-        timezone: localStorage.getItem('timezone') || 'Asia/Kolkata'
+        appLanguage: localStorage.getItem('appLanguage') || 'en'
       }
     };
 
@@ -700,8 +728,11 @@
 
       // Load language settings
       document.getElementById('appLanguage').value = currentSettings.language.appLanguage;
-      document.getElementById('region').value = currentSettings.language.region;
-      document.getElementById('timezone').value = currentSettings.language.timezone;
+      
+      // Update location display
+      if (userLocation) {
+        updateLocationDisplay(`${userLocation.city}, ${userLocation.country}`);
+      }
     }
 
     function saveProfile() {
@@ -833,34 +864,76 @@
     }
 
     function applyLanguage(language) {
+      console.log('Applying language:', language);
+      
+      if (!translations[language]) {
+        console.warn('Language not found:', language);
+        return;
+      }
+
+      // Update all elements with data-translate attribute
       const elements = document.querySelectorAll('[data-translate]');
       elements.forEach(element => {
         const key = element.getAttribute('data-translate');
-        if (translations[language] && translations[language][key]) {
+        if (translations[language][key]) {
           element.textContent = translations[language][key];
+        } else {
+          console.warn('Translation missing for key:', key, 'in language:', language);
         }
       });
 
       // Update placeholder text
-      const placeholder = document.querySelector('input[placeholder]');
-      if (placeholder && translations[language] && translations[language]['message-placeholder']) {
-        placeholder.placeholder = translations[language]['message-placeholder'];
+      const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
+      placeholderElements.forEach(element => {
+        const key = element.getAttribute('data-translate-placeholder');
+        if (translations[language][key]) {
+          element.placeholder = translations[language][key];
+        }
+      });
+
+      // Update dynamic content that might not have data-translate attributes
+      updateDynamicContent(language);
+      
+      // Update document direction for RTL languages
+      if (language === 'ar') {
+        document.documentElement.dir = 'rtl';
+        document.body.style.fontFamily = "'Noto Sans Arabic', 'Segoe UI', Arial, sans-serif";
+      } else {
+        document.documentElement.dir = 'ltr';
+        document.body.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
       }
     }
 
-    function changeRegion() {
-      const region = document.getElementById('region').value;
-      currentSettings.language.region = region;
-      localStorage.setItem('region', region);
-      showNotification('Region updated successfully!', 'success');
+    function updateDynamicContent(language) {
+      // Update weather day names
+      const weatherDays = document.querySelectorAll('.day-name');
+      const dayKeys = ['tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'mon'];
+      weatherDays.forEach((dayElement, index) => {
+        if (dayKeys[index] && translations[language][dayKeys[index]]) {
+          dayElement.textContent = translations[language][dayKeys[index]];
+        }
+      });
+
+      // Update no warnings text
+      const noWarningsText = document.querySelector('.no-warnings-text');
+      if (noWarningsText && translations[language]['no-warnings']) {
+        noWarningsText.textContent = translations[language]['no-warnings'];
+      }
+
+      // Update warning titles if they exist
+      const warningTitle = document.querySelector('.warning-title');
+      if (warningTitle && translations[language]['heavy-rain']) {
+        warningTitle.textContent = translations[language]['heavy-rain'];
+      }
+
+      // Update no chats message
+      const noChatsElement = document.querySelector('.no-chats');
+      if (noChatsElement && translations[language]['no-chats']) {
+        noChatsElement.textContent = translations[language]['no-chats'];
+      }
     }
 
-    function changeTimezone() {
-      const timezone = document.getElementById('timezone').value;
-      currentSettings.language.timezone = timezone;
-      localStorage.setItem('timezone', timezone);
-      showNotification('Timezone updated successfully!', 'success');
-    }
+
 
     function exportData() {
       const allData = {
@@ -1012,6 +1085,27 @@
       }
     });
 
+    // Close budget modal when clicking outside
+    document.getElementById('budgetModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeBudgetModal();
+      }
+    });
+
+    // Close expense modal when clicking outside
+    document.getElementById('expenseModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeExpenseModal();
+      }
+    });
+
+    // Close budget details modal when clicking outside
+    document.getElementById('budgetDetailsModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeBudgetDetailsModal();
+      }
+    });
+
     // Budget Management
     let budgetData = {
       totalBudget: parseFloat(localStorage.getItem('totalBudget')) || 50000,
@@ -1123,8 +1217,346 @@
             <div class="expense-meta">${expense.category} • ${new Date(expense.date).toLocaleDateString()}</div>
           </div>
           <div class="expense-amount">₹${expense.amount.toLocaleString()}</div>
+          <button class="delete-expense-btn" onclick="deleteExpense(${expense.id})" title="Delete expense">
+            <span class="delete-icon">🗑️</span>
+          </button>
         </div>
       `).join('');
+    }
+
+    // Budget Modal Functions
+    function openBudgetModal() {
+      document.getElementById('budgetModal').classList.add('active');
+      // Pre-fill current budget amount
+      document.getElementById('newBudgetAmount').value = budgetData.totalBudget;
+    }
+
+    function closeBudgetModal() {
+      document.getElementById('budgetModal').classList.remove('active');
+      // Clear form
+      document.getElementById('newBudgetAmount').value = '';
+      document.getElementById('budgetPeriod').value = 'monthly';
+    }
+
+    function setBudgetAmount(amount) {
+      document.getElementById('newBudgetAmount').value = amount;
+    }
+
+    function saveBudget() {
+      const newAmount = parseFloat(document.getElementById('newBudgetAmount').value);
+      const period = document.getElementById('budgetPeriod').value;
+
+      if (!newAmount || newAmount <= 0) {
+        showNotification('Please enter a valid budget amount', 'error');
+        return;
+      }
+
+      if (newAmount < 1000) {
+        showNotification('Budget amount should be at least ₹1,000', 'error');
+        return;
+      }
+
+      // Update budget data
+      budgetData.totalBudget = newAmount;
+      localStorage.setItem('totalBudget', newAmount.toString());
+      
+      // Save budget metadata
+      const budgetInfo = {
+        amount: newAmount,
+        period: period,
+        setDate: new Date().toISOString()
+      };
+      localStorage.setItem('budgetInfo', JSON.stringify(budgetInfo));
+
+      // Update display
+      updateBudgetDisplay();
+      closeBudgetModal();
+      
+      const periodText = period === 'monthly' ? 'monthly' : 
+                        period === 'seasonal' ? 'seasonal' : 'yearly';
+      showNotification(`Budget set to ₹${newAmount.toLocaleString()} for ${periodText} period!`, 'success');
+    }
+
+    // Delete individual expense
+    function deleteExpense(expenseId) {
+      if (confirm('Are you sure you want to delete this expense?')) {
+        budgetData.expenses = budgetData.expenses.filter(expense => expense.id !== expenseId);
+        localStorage.setItem('farmExpenses', JSON.stringify(budgetData.expenses));
+        
+        // Update displays
+        updateBudgetDisplay();
+        loadBudgetDetails();
+        
+        showNotification('Expense deleted successfully!', 'success');
+      }
+    }
+
+    // Clear all expenses
+    function clearAllExpenses() {
+      if (confirm('Are you sure you want to delete ALL expenses? This action cannot be undone.')) {
+        budgetData.expenses = [];
+        localStorage.setItem('farmExpenses', JSON.stringify(budgetData.expenses));
+        
+        // Update displays
+        updateBudgetDisplay();
+        loadBudgetDetails();
+        
+        showNotification('All expenses cleared successfully!', 'success');
+      }
+    }
+
+    // Location and Weather Management
+    let userLocation = null;
+
+    function getUserLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Geolocation is not supported by this browser.'));
+          return;
+        }
+
+        // Update location display
+        updateLocationDisplay('Detecting your location...');
+
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            try {
+              // Get location name using OpenWeatherMap reverse geocoding
+              const response = await fetch(`/weather/current/${lat}/${lon}`);
+              const weatherData = await response.json();
+              
+              if (weatherData.success) {
+                userLocation = {
+                  lat: lat,
+                  lon: lon,
+                  city: weatherData.data.location,
+                  country: weatherData.data.country,
+                  temperature: weatherData.data.temperature,
+                  description: weatherData.data.description
+                };
+                
+                localStorage.setItem('userLocation', JSON.stringify(userLocation));
+                updateLocationDisplay(`${userLocation.city}, ${userLocation.country}`);
+                resolve(userLocation);
+              } else {
+                // Fallback without city name
+                userLocation = { lat, lon, city: 'Unknown', country: 'Unknown' };
+                localStorage.setItem('userLocation', JSON.stringify(userLocation));
+                updateLocationDisplay('Location detected (Unknown city)');
+                resolve(userLocation);
+              }
+            } catch (error) {
+              console.error('Error getting location details:', error);
+              // Fallback without city name
+              userLocation = { lat, lon, city: 'Unknown', country: 'Unknown' };
+              localStorage.setItem('userLocation', JSON.stringify(userLocation));
+              updateLocationDisplay('Location detected (Unknown city)');
+              resolve(userLocation);
+            }
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            // Try to use saved location
+            const savedLocation = localStorage.getItem('userLocation');
+            if (savedLocation) {
+              userLocation = JSON.parse(savedLocation);
+              updateLocationDisplay(`${userLocation.city}, ${userLocation.country} (Saved)`);
+              resolve(userLocation);
+            } else {
+              updateLocationDisplay('Location access denied');
+              reject(error);
+            }
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 600000 // 10 minutes
+          }
+        );
+      });
+    }
+
+    function updateLocationDisplay(text) {
+      const locationText = document.getElementById('locationText');
+      if (locationText) {
+        locationText.textContent = text;
+      }
+    }
+
+    function refreshLocation() {
+      // Clear saved location and get fresh location
+      localStorage.removeItem('userLocation');
+      userLocation = null;
+      
+      getUserLocation().then(() => {
+        // Refresh weather data with new location
+        updateWeatherDisplay();
+        updateWarningsDisplay();
+        showNotification('Location refreshed successfully!', 'success');
+      }).catch((error) => {
+        console.error('Failed to refresh location:', error);
+        showNotification('Failed to refresh location. Please check permissions.', 'error');
+      });
+    }
+
+    async function loadWeatherData() {
+      try {
+        await getUserLocation();
+        if (userLocation) {
+          await updateWeatherDisplay();
+          await updateWarningsDisplay();
+        }
+      } catch (error) {
+        console.error('Failed to load weather data:', error);
+        // Show default weather data
+        showDefaultWeather();
+      }
+    }
+
+    async function updateWeatherDisplay() {
+      if (!userLocation) return;
+
+      try {
+        // Get both current weather and forecast
+        const [currentResponse, forecastResponse] = await Promise.all([
+          fetch(`/weather/current/${userLocation.lat}/${userLocation.lon}`),
+          fetch(`/weather/forecast/${userLocation.lat}/${userLocation.lon}`)
+        ]);
+        
+        const currentWeather = await currentResponse.json();
+        const forecastData = await forecastResponse.json();
+        const currentLanguage = localStorage.getItem('appLanguage') || 'en';
+        
+        if (forecastData.success) {
+          const forecasts = forecastData.data.forecasts.slice(0, 5);
+          const weatherGrid = document.querySelector('.weather-grid');
+          
+          weatherGrid.innerHTML = forecasts.map((day, index) => {
+            const date = new Date(day.date);
+            let dayName;
+            
+            if (index === 0) {
+              dayName = currentLanguage === 'hi' ? 'आज' : 
+                       currentLanguage === 'mr' ? 'आज' :
+                       currentLanguage === 'gu' ? 'આજે' :
+                       currentLanguage === 'es' ? 'Hoy' :
+                       currentLanguage === 'ar' ? 'اليوم' : 'Today';
+            } else {
+              const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+              const dayKey = dayKeys[date.getDay()];
+              dayName = translations[currentLanguage] && translations[currentLanguage][dayKey] ? 
+                       translations[currentLanguage][dayKey] : 
+                       date.toLocaleDateString('en', { weekday: 'short' });
+            }
+            
+            const icon = getWeatherIcon(day.condition ? day.condition.main : day.condition);
+            
+            return `
+              <div class="weather-day">
+                <div class="day-name">${dayName}</div>
+                <div class="weather-icon">${icon}</div>
+                <div class="temp-high">${day.tempMax}°</div>
+                <div class="temp-low">${day.tempMin}°</div>
+              </div>
+            `;
+          }).join('');
+          
+          // Update weather card title with location
+          if (currentWeather.success) {
+            const weatherTitle = document.querySelector('.weather-card .card-title');
+            if (weatherTitle) {
+              const weatherText = translations[currentLanguage] && translations[currentLanguage]['weather'] ? 
+                                 translations[currentLanguage]['weather'] : 'Weather';
+              weatherTitle.textContent = `${weatherText} - ${currentWeather.data.location}`;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error updating weather display:', error);
+        showDefaultWeather();
+      }
+    }
+
+    async function updateWarningsDisplay() {
+      if (!userLocation) return;
+
+      try {
+        const response = await fetch(`/weather/alerts/${userLocation.lat}/${userLocation.lon}`);
+        const alertsData = await response.json();
+        
+        const warningsContent = document.getElementById('warningsContent');
+        const activeWarning = document.getElementById('activeWarning');
+        const noWarnings = document.getElementById('noWarnings');
+        
+        if (alertsData.success && alertsData.data.length > 0) {
+          const alert = alertsData.data[0]; // Show first alert
+          const currentLanguage = localStorage.getItem('appLanguage') || 'en';
+          
+          activeWarning.className = `warning-item active ${alert.severity}`;
+          activeWarning.innerHTML = `
+            <div class="warning-icon">${getWarningIcon(alert.title)}</div>
+            <div class="warning-info">
+              <div class="warning-title">${alert.title}</div>
+              <div class="warning-desc">${alert.description}</div>
+              <div class="warning-time">Valid until: ${alert.end.toLocaleString()}</div>
+            </div>
+          `;
+          activeWarning.style.display = 'flex';
+          noWarnings.style.display = 'none';
+        } else {
+          const currentLanguage = localStorage.getItem('appLanguage') || 'en';
+          const noWarningsText = translations[currentLanguage] && translations[currentLanguage]['no-warnings'] ? 
+                                 translations[currentLanguage]['no-warnings'] : 'No active weather warnings';
+          
+          noWarnings.querySelector('.no-warnings-text').textContent = noWarningsText;
+          activeWarning.style.display = 'none';
+          noWarnings.style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('Error updating warnings display:', error);
+      }
+    }
+
+    function getWeatherIcon(condition) {
+      const iconMap = {
+        'Clear': '☀️',
+        'Clouds': '☁️',
+        'Rain': '🌧️',
+        'Drizzle': '🌦️',
+        'Thunderstorm': '⛈️',
+        'Snow': '❄️',
+        'Mist': '🌫️',
+        'Fog': '🌫️'
+      };
+      return iconMap[condition] || '🌤️';
+    }
+
+    function getWarningIcon(title) {
+      const iconMap = {
+        'rain': '🌧️',
+        'storm': '⛈️',
+        'wind': '💨',
+        'heat': '🌡️',
+        'cold': '❄️',
+        'flood': '🌊',
+        'drought': '🏜️'
+      };
+      
+      const lowerTitle = title.toLowerCase();
+      for (const [key, icon] of Object.entries(iconMap)) {
+        if (lowerTitle.includes(key)) {
+          return icon;
+        }
+      }
+      return '⚠️';
+    }
+
+    function showDefaultWeather() {
+      // Show default weather data when location is not available
+      console.log('Showing default weather data');
     }
 
     // Initialize dashboard

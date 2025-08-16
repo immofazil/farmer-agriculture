@@ -147,16 +147,26 @@
       }
 
       async createNewChat() {
-        const chatId = Date.now().toString();
-        const newChat = {
-          id: chatId,
-          title: 'New Chat',
-          messages: [],
-          createdAt: new Date().toISOString()
-        };
+        // Check if there's already a "New Chat" that we can use
+        let existingNewChat = this.chats.find(chat => chat.title === 'New Chat' && chat.messages.length === 0);
+        
+        if (existingNewChat) {
+          // Use existing new chat
+          this.currentChatId = existingNewChat.id;
+        } else {
+          // Create a new chat only if needed
+          const chatId = Date.now().toString();
+          const newChat = {
+            id: chatId,
+            title: 'New Chat',
+            messages: [],
+            createdAt: new Date().toISOString()
+          };
 
-        this.chats.unshift(newChat);
-        this.currentChatId = chatId;
+          this.chats.unshift(newChat);
+          this.currentChatId = chatId;
+        }
+        
         this.renderChatHistory();
         this.loadCurrentChat();
       }
@@ -228,6 +238,7 @@
 
         const chat = this.chats.find(c => c.id === this.currentChatId);
         if (chat) {
+          // Add message to existing chat
           chat.messages.push({
             id: Date.now().toString(),
             content,
@@ -240,6 +251,7 @@
             chat.title = content.substring(0, 30) + (content.length > 30 ? '...' : '');
           }
 
+          // Save the updated chat (this will update the existing chat, not create a new one)
           await this.saveChatToDatabase(chat);
           this.renderMessages(chat.messages);
           this.renderChatHistory();
@@ -286,12 +298,27 @@
       async loadChatHistory() {
         try {
           if (this.userId) {
+            // First, clean up any duplicate chats in the database
+            await this.cleanupDuplicateChats();
+            
             // Load from database (primary source)
             const response = await fetch(`/chat-history/${this.userId}`);
             const result = await response.json();
             if (result.success) {
               this.chats = result.chats;
-              this.currentChatId = this.chats.length > 0 ? this.chats[0]?.id : null;
+              
+              // Remove duplicate chats based on title and content
+              this.chats = this.removeDuplicateChats(this.chats);
+              
+              // Find the most recent chat or create a new one if none exist
+              if (this.chats.length > 0) {
+                // Sort by creation date and use the most recent
+                this.chats.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                this.currentChatId = this.chats[0].id;
+              } else {
+                // No chats exist, create a new one
+                await this.createNewChat();
+              }
 
               // Clear localStorage to prevent conflicts
               localStorage.removeItem('farmerChats');
@@ -322,6 +349,53 @@
           this.currentChatId = localStorage.getItem('currentChatId') || null;
           this.renderChatHistory();
           this.loadCurrentChat();
+        }
+      }
+
+      removeDuplicateChats(chats) {
+        const uniqueChats = [];
+        const seenTitles = new Set();
+        
+        for (const chat of chats) {
+          // Normalize title for comparison (remove ellipsis and trim)
+          const normalizedTitle = chat.title.replace(/\.\.\.$/, '').trim();
+          
+          if (!seenTitles.has(normalizedTitle)) {
+            seenTitles.add(normalizedTitle);
+            uniqueChats.push(chat);
+          } else {
+            // If duplicate found, keep the one with more messages or newer date
+            const existingChat = uniqueChats.find(c => 
+              c.title.replace(/\.\.\.$/, '').trim() === normalizedTitle
+            );
+            
+            if (existingChat) {
+              if (chat.messages.length > existingChat.messages.length || 
+                  new Date(chat.createdAt) > new Date(existingChat.createdAt)) {
+                // Replace existing chat with this one
+                const index = uniqueChats.indexOf(existingChat);
+                uniqueChats[index] = chat;
+              }
+            }
+          }
+        }
+        
+        return uniqueChats;
+      }
+
+      async cleanupDuplicateChats() {
+        if (!this.userId) return;
+        
+        try {
+          const response = await fetch(`/cleanup-chats/${this.userId}`, {
+            method: 'POST'
+          });
+          const result = await response.json();
+          if (result.success) {
+            console.log('✅ Cleaned up duplicate chats:', result.message);
+          }
+        } catch (error) {
+          console.error('Error cleaning up duplicate chats:', error);
         }
       }
 

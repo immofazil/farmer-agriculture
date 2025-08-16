@@ -7,9 +7,9 @@ import db from './database.js';
 const app = express();
 const PORT = process.env.PORT || 7860; // Hugging Face uses port 7860
 
-// Debug: Check if Gemini API key is loaded
-console.log('🔑 Gemini API Key loaded:', process.env.GEMINI_API_KEY ? 'Yes (length: ' + process.env.GEMINI_API_KEY.length + ')' : 'No');
-console.log('🤖 Gemini AI Service will be used for responses');
+// Debug: Check if Groq API key is loaded
+console.log('🔑 Groq API Key loaded:', process.env.GROQ_API_KEY ? 'Yes (length: ' + process.env.GROQ_API_KEY.length + ')' : 'No');
+console.log('🤖 Groq AI Service will be used for responses');
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -102,6 +102,18 @@ app.delete('/delete-chat/:userId/:chatId', async (req, res) => {
   } catch (error) {
     console.error('Delete chat error:', error);
     res.status(500).json({ success: false, message: 'Failed to delete chat' });
+  }
+});
+
+// Clean up duplicate chats for a user
+app.post('/cleanup-chats/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await db.cleanupDuplicateChats(userId);
+    res.json(result);
+  } catch (error) {
+    console.error('Cleanup chats error:', error);
+    res.status(500).json({ success: false, message: 'Failed to cleanup chats' });
   }
 });
 
@@ -248,13 +260,20 @@ app.use((err, req, res, next) => {
 // Graceful shutdown
 process.on('SIGINT', () => {
   console.log('Shutting down gracefully...');
-  db.close();
+  // Close database connection if available
+  if (typeof db !== 'undefined' && db && typeof db.close === 'function') {
+    db.close();
+  }
   process.exit(0);
 });
 
 // Initialize knowledge service and start server
 async function startServer() {
   try {
+    // Wait for database to be ready
+    console.log('⏳ Waiting for database to initialize...');
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
     // Initialize knowledge service
     const { default: knowledgeService } = await import('./knowledgeService.js');
     
@@ -268,6 +287,7 @@ async function startServer() {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🧠 RAG-powered farming advisor ready!`);
       console.log(`📚 Knowledge base initializing...`);
+      console.log(`✅ Database is ready for connections`);
     });
   } catch (error) {
     console.error('❌ Error starting server:', error);

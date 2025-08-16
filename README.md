@@ -12,123 +12,50 @@ license: mit
 
 An intelligent farming advisor that uses Retrieval-Augmented Generation (RAG) to provide personalized agricultural advice.
 
-## 🚀 Features
+## Features
 
 - 🧠 **RAG System**: Retrieves relevant farming knowledge before generating responses
-- ⚡ **Ultra-Fast AI**: Powered by Groq API for sub-second responses
-- 👤 **Personalized Advice**: Considers your farm profile, budget, and location
-- 🌍 **Multi-language Support**: English, Hindi, Marathi, Gujarati, Spanish, Arabic
-- 🌤️ **Weather Integration**: Real-time weather data and farming recommendations
-- 💰 **Budget Management**: Track farming expenses and manage budgets
-- 📚 **Knowledge Base**: 51+ curated farming articles with vector search
+- ⚡ **Fast AI**: Powered by Groq API for intelligent responses
+- 👤 **Personalized**: Considers your farm profile, budget, and location
+- 🌍 **Multi-language**: Supports multiple languages
+- 🌤️ **Weather-aware**: Integrates real-time weather data
+- 💰 **Budget tracking**: Manage farming expenses and budgets
+- 🔐 **User Authentication**: Secure login and registration system
 
-## 🎯 How It Works
+## Usage
 
-1. **Knowledge Retrieval**: System searches 51+ farming articles using semantic similarity
-2. **Context Building**: Combines retrieved knowledge + user profile + weather data
-3. **AI Generation**: Groq API generates personalized responses using all context
-4. **Multi-language**: Automatically detects and responds in user's language
+1. Fill in your profile and farm information in Settings
+2. Set your farming budget and track expenses
+3. Ask questions about farming in your preferred language
+4. Get personalized advice based on your specific situation
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Backend**: Node.js, Express
-- **AI**: Groq API with Llama 3.1 (8B parameters)
-- **RAG**: Vector embeddings with semantic search
-- **Knowledge Base**: SQLite with 384-dimensional embeddings
+- **AI**: Groq API
+- **Knowledge Base**: SQLite with vector embeddings
 - **Embeddings**: Xenova Transformers (all-MiniLM-L6-v2)
-- **Weather**: OpenWeatherMap API integration
-- **Frontend**: Vanilla JavaScript, responsive design
+- **Weather**: OpenWeatherMap API
+- **Authentication**: bcryptjs for password hashing
 
-## 📖 Usage Guide
+## Getting Started
 
-### 1. **Setup Your Profile**
-- Go to Settings → Profile: Add your name, location, contact info
-- Go to Settings → Farm Info: Enter farm details, crops, soil type, irrigation
-- Set your farming budget and track expenses
+1. Register a new account
+2. Login with your credentials
+3. Set up your farm profile
+4. Start asking farming questions!
 
-### 2. **Ask Questions**
-- Use natural language in any supported language
-- Examples:
-  - "गेहूं की खेती कैसे करें?" (Hindi)
-  - "What's the best irrigation for tomatoes?"
-  - "How should I manage my budget for this season?"
+## API Endpoints
 
-### 3. **Get Personalized Advice**
-- Responses consider your specific farm characteristics
-- Weather conditions influence recommendations
-- Budget constraints are factored into suggestions
+- `POST /register` - User registration
+- `POST /login` - User authentication
+- `POST /save-chat` - Save chat history
+- `GET /chat-history/:userId` - Get user's chat history
+- `POST /knowledge/search` - Search farming knowledge
+- `GET /knowledge` - Get all knowledge entries
 
-## 🌟 Sample Knowledge Base
+## Environment Variables
 
-The system includes expert knowledge on:
-
-- **Crop Management**: Wheat, rice, tomatoes, potatoes, corn, soybeans
-- **Soil Health**: pH management, composting, organic amendments
-- **Irrigation**: Drip systems, sprinklers, water conservation
-- **Pest Control**: IPM, organic methods, disease prevention
-- **Sustainable Practices**: Crop rotation, cover crops, green manure
-- **Weather Adaptation**: Frost protection, drought management
-- **Equipment**: Maintenance, safety, optimization
-
-## 🔧 Local Development
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd farming-advisor-rag
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env
-# Add your GROQ_API_KEY and WEATHER_API_KEY
-
-# Populate knowledge base
-node populateKnowledge.cjs
-
-# Start the server
-npm start
-```
-
-## 🌍 Supported Languages
-
-- **English**: Full support with technical terminology
-- **Hindi (हिंदी)**: Complete farming vocabulary
-- **Marathi (मराठी)**: Agricultural terms and advice
-- **Gujarati (ગુજરાતી)**: Farming guidance and tips
-- **Spanish (Español)**: Agricultural terminology
-- **Arabic (العربية)**: Farming advice with RTL support
-
-## 📊 Performance
-
-- **Response Time**: < 1 second average
-- **Knowledge Retrieval**: Semantic search across 51+ articles
-- **Accuracy**: Responses based on curated agricultural knowledge
-- **Personalization**: Considers 15+ user profile factors
-- **Weather Integration**: Real-time data from OpenWeatherMap
-
-## 🤝 Contributing
-
-This is an open-source project. Contributions welcome:
-
-1. **Add Knowledge**: Contribute farming expertise
-2. **Improve Translations**: Enhance multi-language support
-3. **Bug Fixes**: Report and fix issues
-4. **Feature Requests**: Suggest new capabilities
-
-## 📄 License
-
-MIT License - Feel free to use, modify, and distribute.
-
-## 🙏 Acknowledgments
-
-- **Groq**: Ultra-fast AI inference
-- **Hugging Face**: Free hosting and transformers
-- **OpenWeatherMap**: Weather data API
-- **Xenova**: Browser-compatible transformers
-- **Farming Community**: Knowledge and feedback
-
----
-
-**Try it now!** Ask any farming question in your preferred language and get personalized, expert advice powered by RAG technology. 🌾✨
+- `GROQ_API_KEY` - Groq API key
+- `WEATHER_API_KEY` - OpenWeatherMap API key
+- `PORT` - Server port (default: 7860)

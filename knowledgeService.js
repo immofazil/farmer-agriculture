@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 import sqlite3 from 'sqlite3';
-const { verbose } = sqlite3;
 import { pipeline } from '@xenova/transformers';
 
 class KnowledgeService {
@@ -29,7 +28,7 @@ class KnowledgeService {
 
   async initDatabase() {
     return new Promise((resolve, reject) => {
-      this.db = new verbose().Database(this.dbPath, (err) => {
+      this.db = new sqlite3.Database(this.dbPath, (err) => {
         if (err) {
           reject(err);
           return;
@@ -126,7 +125,7 @@ class KnowledgeService {
             return {
               ...row,
               similarity,
-              tags: JSON.parse(row.tags || '[]')
+              tags: this.parseTags(row.tags)
             };
           });
 
@@ -163,7 +162,7 @@ class KnowledgeService {
         } else {
           const results = rows.map(row => ({
             ...row,
-            tags: JSON.parse(row.tags || '[]')
+            tags: this.parseTags(row.tags)
           }));
           resolve(results);
         }
@@ -259,6 +258,35 @@ class KnowledgeService {
     } catch (error) {
       console.error('❌ Error seeding knowledge:', error);
     }
+  }
+
+  // Helper method to safely parse tags
+  parseTags(tags) {
+    if (!tags) return [];
+    
+    // Handle different tag formats
+    if (typeof tags === 'string') {
+      // Check if it's already a JSON string
+      if (tags.startsWith('[') && tags.endsWith(']')) {
+        try {
+          return JSON.parse(tags);
+        } catch (error) {
+          // If JSON parsing fails, try to split by comma
+          return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        }
+      } else {
+        // Split by comma if it's a comma-separated string
+        return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+      }
+    }
+    
+    // If it's already an array, return it
+    if (Array.isArray(tags)) {
+      return tags;
+    }
+    
+    // Default fallback
+    return [];
   }
 }
 

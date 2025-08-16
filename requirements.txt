@@ -1,0 +1,2 @@
+# Python requirements for Hugging Face Spaces
+# This file is required even though we're using Node.js

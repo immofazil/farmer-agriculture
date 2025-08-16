@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 class FarmingAIService {
   constructor() {
@@ -221,7 +221,7 @@ Always aim to be helpful, accurate, and supportive in your responses. If you're 
 
   async getWeatherContext(location) {
     try {
-      const weatherService = require('./weatherService');
+      const { default: weatherService } = await import('./weatherService.js');
       
       // Get current weather
       const currentWeather = await weatherService.getCurrentWeather(location.lat, location.lon);
@@ -333,4 +333,4 @@ Please feel free to ask me specific questions about any aspect of farming, and I
   }
 }
 
-module.exports = new FarmingAIService();
+export default new FarmingAIService();

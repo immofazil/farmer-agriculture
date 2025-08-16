@@ -1,8 +1,11 @@
-require('dotenv').config();
-const express = require('express');
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
+import db from './database.js';
+
 const app = express();
-const PORT = process.env.PORT || 3000;
-const db = require('./database');
+const PORT = process.env.PORT || 7860; // Hugging Face uses port 7860
 
 // Debug: Check if Gemini API key is loaded
 console.log('🔑 Gemini API Key loaded:', process.env.GEMINI_API_KEY ? 'Yes (length: ' + process.env.GEMINI_API_KEY.length + ')' : 'No');
@@ -106,7 +109,7 @@ app.delete('/delete-chat/:userId/:chatId', async (req, res) => {
 app.get('/weather/current/:lat/:lon', async (req, res) => {
   try {
     const { lat, lon } = req.params;
-    const weatherService = require('./weatherService');
+    const { default: weatherService } = await import('./weatherService.js');
     const weather = await weatherService.getCurrentWeather(parseFloat(lat), parseFloat(lon));
     res.json(weather);
   } catch (error) {
@@ -118,7 +121,7 @@ app.get('/weather/current/:lat/:lon', async (req, res) => {
 app.get('/weather/forecast/:lat/:lon', async (req, res) => {
   try {
     const { lat, lon } = req.params;
-    const weatherService = require('./weatherService');
+    const { default: weatherService } = await import('./weatherService.js');
     const forecast = await weatherService.getForecast(parseFloat(lat), parseFloat(lon));
     res.json(forecast);
   } catch (error) {
@@ -130,7 +133,7 @@ app.get('/weather/forecast/:lat/:lon', async (req, res) => {
 app.get('/weather/alerts/:lat/:lon', async (req, res) => {
   try {
     const { lat, lon } = req.params;
-    const weatherService = require('./weatherService');
+    const { default: weatherService } = await import('./weatherService.js');
     const alerts = await weatherService.getWeatherAlerts(parseFloat(lat), parseFloat(lon));
     res.json(alerts);
   } catch (error) {
@@ -149,7 +152,7 @@ app.post('/ask', async (req, res) => {
     }
 
     // Use the Groq RAG service to generate intelligent responses
-    const groqRAGService = require('./groqRAGService');
+    const { default: groqRAGService } = await import('./groqRAGService.js');
     const answer = await groqRAGService.generateResponse(question.trim(), conversationHistory, userLocation, userProfile);
 
     console.log(`Question: ${question}`);
@@ -161,7 +164,7 @@ app.post('/ask', async (req, res) => {
     console.error('Error in /ask:', err);
 
     // Fallback to basic response if RAG service fails
-    const groqRAGService = require('./groqRAGService');
+    const { default: groqRAGService } = await import('./groqRAGService.js');
     const fallbackAnswer = await groqRAGService.getFallbackResponse(req.body.question || '');
 
     res.json({
@@ -172,7 +175,7 @@ app.post('/ask', async (req, res) => {
 });
 
 // Knowledge Management Endpoints
-const knowledgeService = require('./knowledgeService');
+import knowledgeService from './knowledgeService.js';
 
 // Get all knowledge entries
 app.get('/knowledge', async (req, res) => {
@@ -253,7 +256,7 @@ process.on('SIGINT', () => {
 async function startServer() {
   try {
     // Initialize knowledge service
-    const knowledgeService = require('./knowledgeService');
+    const { default: knowledgeService } = await import('./knowledgeService.js');
     
     // Wait a moment for the service to initialize
     setTimeout(async () => {

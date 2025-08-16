@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 class WeatherService {
   constructor() {
@@ -273,4 +273,4 @@ class WeatherService {
   }
 }
 
-module.exports = new WeatherService();
+export default new WeatherService();

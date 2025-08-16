@@ -1,11 +1,16 @@
-const sqlite3 = require('sqlite3').verbose();
-const bcrypt = require('bcryptjs');
-const path = require('path');
+import sqlite3 from 'sqlite3';
+const { verbose } = sqlite3;
+import bcrypt from 'bcryptjs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class Database {
   constructor() {
     this.dbPath = path.join(__dirname, 'users.db');
-    this.db = new sqlite3.Database(this.dbPath);
+    this.db = new verbose().Database(this.dbPath);
     this.init();
   }
 
@@ -307,4 +312,4 @@ class Database {
   }
 }
 
-module.exports = new Database(); 
+export default new Database(); 

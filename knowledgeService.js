@@ -1,7 +1,8 @@
-const fs = require('fs').promises;
-const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
-const { pipeline } = require('@xenova/transformers');
+import fs from 'fs/promises';
+import path from 'path';
+import sqlite3 from 'sqlite3';
+const { verbose } = sqlite3;
+import { pipeline } from '@xenova/transformers';
 
 class KnowledgeService {
   constructor() {
@@ -28,7 +29,7 @@ class KnowledgeService {
 
   async initDatabase() {
     return new Promise((resolve, reject) => {
-      this.db = new sqlite3.Database(this.dbPath, (err) => {
+      this.db = new verbose().Database(this.dbPath, (err) => {
         if (err) {
           reject(err);
           return;
@@ -261,4 +262,4 @@ class KnowledgeService {
   }
 }
 
-module.exports = new KnowledgeService();
+export default new KnowledgeService();

@@ -1,5 +1,5 @@
-const Groq = require('groq-sdk');
-const knowledgeService = require('./knowledgeService');
+import Groq from 'groq-sdk';
+import knowledgeService from './knowledgeService.js';
 
 class GroqRAGService {
   constructor() {
@@ -247,7 +247,7 @@ Always be helpful, accurate, and supportive in your responses.`;
 
   async getWeatherContext(location) {
     try {
-      const weatherService = require('./weatherService');
+      const { default: weatherService } = await import('./weatherService.js');
 
       const currentWeather = await weatherService.getCurrentWeather(location.lat, location.lon);
       const forecast = await weatherService.getForecast(location.lat, location.lon);
@@ -348,4 +348,4 @@ Always be helpful, accurate, and supportive in your responses.`;
   }
 }
 
-module.exports = new GroqRAGService();
+export default new GroqRAGService();

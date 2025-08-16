@@ -139,7 +139,7 @@ app.get('/weather/alerts/:lat/:lon', async (req, res) => {
   }
 });
 
-// POST endpoint for farmer questions with AI integration
+// POST endpoint for farmer questions with Groq RAG integration
 app.post('/ask', async (req, res) => {
   try {
     const { question, conversationHistory, userLocation, userProfile } = req.body;
@@ -148,26 +148,91 @@ app.post('/ask', async (req, res) => {
       return res.json({ answer: 'Please ask me a specific question about farming, and I\'ll be happy to help!' });
     }
 
-    // Use the AI service to generate intelligent responses with user profile context
-    const aiService = require('./aiService');
-    const answer = await aiService.generateResponse(question.trim(), conversationHistory, userLocation, userProfile);
+    // Use the Groq RAG service to generate intelligent responses
+    const groqRAGService = require('./groqRAGService');
+    const answer = await groqRAGService.generateResponse(question.trim(), conversationHistory, userLocation, userProfile);
 
     console.log(`Question: ${question}`);
     console.log(`User Profile included:`, userProfile ? 'Yes' : 'No');
-    console.log(`Answer generated successfully`);
+    console.log(`Answer generated successfully with RAG`);
 
     res.json({ answer });
   } catch (err) {
     console.error('Error in /ask:', err);
 
-    // Fallback to basic response if AI fails
-    const aiService = require('./aiService');
-    const fallbackAnswer = aiService.getFallbackResponse(req.body.question || '');
+    // Fallback to basic response if RAG service fails
+    const groqRAGService = require('./groqRAGService');
+    const fallbackAnswer = await groqRAGService.getFallbackResponse(req.body.question || '');
 
     res.json({
       answer: fallbackAnswer,
-      note: 'This is a basic response due to technical issues. Full AI functionality will be restored shortly.'
+      note: 'This is a response from our knowledge base due to technical issues. Full AI functionality will be restored shortly.'
     });
+  }
+});
+
+// Knowledge Management Endpoints
+const knowledgeService = require('./knowledgeService');
+
+// Get all knowledge entries
+app.get('/knowledge', async (req, res) => {
+  try {
+    const knowledge = await knowledgeService.getAllKnowledge();
+    res.json({ success: true, data: knowledge });
+  } catch (error) {
+    console.error('Error fetching knowledge:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch knowledge' });
+  }
+});
+
+// Add new knowledge entry
+app.post('/knowledge', async (req, res) => {
+  try {
+    const { title, content, category, tags } = req.body;
+    
+    if (!title || !content) {
+      return res.status(400).json({ success: false, error: 'Title and content are required' });
+    }
+
+    const id = await knowledgeService.addKnowledge(title, content, category || 'general', tags || []);
+    res.json({ success: true, id });
+  } catch (error) {
+    console.error('Error adding knowledge:', error);
+    res.status(500).json({ success: false, error: 'Failed to add knowledge' });
+  }
+});
+
+// Delete knowledge entry
+app.delete('/knowledge/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const changes = await knowledgeService.deleteKnowledge(id);
+    
+    if (changes > 0) {
+      res.json({ success: true, message: 'Knowledge deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, error: 'Knowledge not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting knowledge:', error);
+    res.status(500).json({ success: false, error: 'Failed to delete knowledge' });
+  }
+});
+
+// Search knowledge
+app.post('/knowledge/search', async (req, res) => {
+  try {
+    const { query, limit } = req.body;
+    
+    if (!query) {
+      return res.status(400).json({ success: false, error: 'Query is required' });
+    }
+
+    const results = await knowledgeService.searchSimilar(query, limit || 5);
+    res.json({ success: true, data: results });
+  } catch (error) {
+    console.error('Error searching knowledge:', error);
+    res.status(500).json({ success: false, error: 'Failed to search knowledge' });
   }
 });
 
@@ -184,6 +249,27 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Initialize knowledge service and start server
+async function startServer() {
+  try {
+    // Initialize knowledge service
+    const knowledgeService = require('./knowledgeService');
+    
+    // Wait a moment for the service to initialize
+    setTimeout(async () => {
+      await knowledgeService.seedInitialKnowledge();
+    }, 2000);
+
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🧠 RAG-powered farming advisor ready!`);
+      console.log(`📚 Knowledge base initializing...`);
+    });
+  } catch (error) {
+    console.error('❌ Error starting server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

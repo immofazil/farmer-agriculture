@@ -3,68 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personalized AI Test</title>
+    <title>RAG-Powered Farming Advisor Test</title>
 </head>
 <body>
-    <h1>🤖 Personalized AI Chatbot Test</h1>
+    <h1>🧠 RAG-Powered Farming Advisor Test</h1>
     <p>Open the dashboard at <a href="http://localhost:3000/dashboard.html">http://localhost:3000/dashboard.html</a></p>
     
-    <h2>✅ New Feature: Personalized AI Responses</h2>
-    <p>The chatbot now uses your profile and farm information to provide personalized farming advice!</p>
+    <h2>🚀 New RAG System Features</h2>
+    <ul>
+        <li><strong>Groq API</strong> - Ultra-fast AI responses (much faster than Gemini)</li>
+        <li><strong>RAG System</strong> - Retrieves relevant farming knowledge before generating responses</li>
+        <li><strong>Vector Embeddings</strong> - Semantic search of farming knowledge</li>
+        <li><strong>Knowledge Management</strong> - Add and manage farming expertise</li>
+        <li><strong>Personalized Responses</strong> - Based on your farm profile and current conditions</li>
+    </ul>
     
-    <h2>🧪 Test Setup:</h2>
+    <h2>🔧 Setup Requirements:</h2>
     <ol>
-        <li><strong>Fill Profile Information:</strong>
+        <li><strong>Get Groq API Key:</strong>
             <ul>
-                <li>Go to Settings → Profile tab</li>
-                <li>Enter your name, email, phone, location</li>
-                <li>Click "Save Profile"</li>
+                <li>Visit <a href="https://console.groq.com/" target="_blank">Groq Console</a></li>
+                <li>Sign up for free account</li>
+                <li>Create API key</li>
+                <li>Add to .env file: GROQ_API_KEY=your-key-here</li>
             </ul>
         </li>
-        <li><strong>Fill Farm Information:</strong>
+        <li><strong>Start Server:</strong>
             <ul>
-                <li>Go to Settings → Farm Info tab</li>
-                <li>Enter farm name, size (acres), soil type</li>
-                <li>Add primary crops (e.g., "Wheat, Rice, Corn")</li>
-                <li>Select irrigation type</li>
-                <li>Click "Save Farm Info"</li>
+                <li>Run: <code>node index.js</code></li>
+                <li>Wait for: "🧠 RAG-powered farming advisor ready!"</li>
+                <li>Knowledge base will initialize automatically</li>
             </ul>
         </li>
-        <li><strong>Set Budget:</strong>
+    </ol>
+
+    <h2>🧪 Test the RAG System:</h2>
+    <ol>
+        <li><strong>Test Knowledge Base:</strong>
             <ul>
-                <li>Click "💰 Set Budget" button</li>
-                <li>Set a budget amount and period</li>
-                <li>Add some expenses using "Add Expense"</li>
+                <li>Go to Dashboard → Knowledge Base section</li>
+                <li>Check knowledge stats (should show 8+ articles)</li>
+                <li>Click "📖 View All" to see initial knowledge</li>
+                <li>Click "➕ Add Knowledge" to add your own farming expertise</li>
+            </ul>
+        </li>
+        <li><strong>Fill Your Profile:</strong>
+            <ul>
+                <li>Settings → Profile: Name, location, contact info</li>
+                <li>Settings → Farm Info: Farm details, crops, soil type</li>
+                <li>Set Budget: Budget amount and add some expenses</li>
+            </ul>
+        </li>
+        <li><strong>Test RAG Responses:</strong>
+            <ul>
+                <li>Go to chat interface</li>
+                <li>Ask: "Tell me about wheat cultivation"</li>
+                <li>Ask: "What irrigation method is best for my farm?"</li>
+                <li>Ask: "How should I manage my soil pH?"</li>
+                <li>Ask: "Give me advice based on my farm profile"</li>
             </ul>
         </li>
     </ol>
     
-    <h2>🎯 Test Personalized AI:</h2>
-    <ol>
-        <li>Go to the chat interface (click the chatbot card or "New Chat")</li>
-        <li>Ask questions like:
-            <ul>
-                <li>"What crops should I plant this season?"</li>
-                <li>"How should I manage my budget for farming?"</li>
-                <li>"What's the best irrigation method for my soil type?"</li>
-                <li>"Give me advice based on my farm size"</li>
-            </ul>
-        </li>
-        <li>The AI should now provide personalized responses based on:
-            <ul>
-                <li>Your farm size and location</li>
-                <li>Your soil type and current crops</li>
-                <li>Your irrigation method</li>
-                <li>Your budget and expenses</li>
-                <li>Current weather conditions</li>
-            </ul>
-        </li>
-    </ol>
+    <h2>🎯 Expected RAG Behavior:</h2>
+    <ul>
+        <li><strong>Knowledge Retrieval:</strong> System searches knowledge base for relevant information</li>
+        <li><strong>Contextual Responses:</strong> Answers include specific farming knowledge from database</li>
+        <li><strong>Personalization:</strong> Advice tailored to your farm profile and conditions</li>
+        <li><strong>Fast Responses:</strong> Groq API provides sub-second response times</li>
+        <li><strong>Accurate Information:</strong> Responses based on curated farming expertise</li>
+    </ul>
     
-    <h2>🌟 Expected Behavior:</h2>
-    <p>The AI will now give you specific advice tailored to your farm's characteristics, budget constraints, and current conditions instead of generic farming advice.</p>
+    <h2>🔍 Monitor Server Logs:</h2>
+    <p>Watch for these messages in the console:</p>
+    <ul>
+        <li><code>🔍 Searching knowledge base...</code> - RAG retrieval working</li>
+        <li><code>📡 Calling Groq API...</code> - API call initiated</li>
+        <li><code>✅ Groq API response received</code> - Successful response</li>
+        <li><code>User Profile included: Yes</code> - Personalization active</li>
+    </ul>
     
-    <h2>🔍 Check Server Logs:</h2>
-    <p>In the server console, you should see: "User Profile included: Yes" when you send messages.</p>
+    <h2>🌟 RAG System Benefits:</h2>
+    <ul>
+        <li><strong>Accuracy:</strong> Responses based on verified farming knowledge</li>
+        <li><strong>Speed:</strong> Ultra-fast Groq API responses</li>
+        <li><strong>Relevance:</strong> Semantic search finds most relevant information</li>
+        <li><strong>Personalization:</strong> Considers your specific farm characteristics</li>
+        <li><strong>Scalability:</strong> Easy to add new farming knowledge</li>
+    </ul>
+    
+    <h2>📚 Knowledge Management:</h2>
+    <p>You can now add your own farming expertise to improve the AI's responses:</p>
+    <ul>
+        <li>Add crop-specific growing guides</li>
+        <li>Include local farming practices</li>
+        <li>Document pest management strategies</li>
+        <li>Share soil management techniques</li>
+    </ul>
 </body>
 </html>
